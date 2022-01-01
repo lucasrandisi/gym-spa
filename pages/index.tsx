@@ -11,15 +11,21 @@ import { AccountCircle } from "@mui/icons-material";
 export default function Home() {
     const [adminLogin, setAdminLogin] = useState(true);
 
-    const formik = useFormik({
-        initialValues: adminLogin
-            ? {
-                  email: "",
-                  password: "",
-              }
-            : { dni: "" },
+    const adminFormik = useFormik({
+        initialValues: {
+            email: "",
+            password: "",
+        },
         onSubmit: (values: any) => {
-            alert(JSON.stringify(values, null, 2));
+            console.log(values);
+        },
+    });
+    const clientFormkik = useFormik({
+        initialValues: {
+            dni: "",
+        },
+        onSubmit: (values: any) => {
+            console.log(values);
         },
     });
 
@@ -29,7 +35,13 @@ export default function Home() {
                 <div className={styles.leftContainer}>
                     <h1>Login</h1>
                     <h2>Bienvenido al gimnasio</h2>
-                    <form onSubmit={formik.handleSubmit}>
+                    <form
+                        onSubmit={
+                            adminLogin
+                                ? adminFormik.handleSubmit
+                                : clientFormkik.handleSubmit
+                        }
+                    >
                         {adminLogin ? (
                             <React.Fragment>
                                 <TextField
@@ -44,8 +56,8 @@ export default function Home() {
                                             </InputAdornment>
                                         ),
                                     }}
-                                    value={formik.values.email}
-                                    onChange={formik.handleChange}
+                                    value={adminFormik.values.email}
+                                    onChange={adminFormik.handleChange}
                                 />
                                 <TextField
                                     id="password"
@@ -60,8 +72,8 @@ export default function Home() {
                                             </InputAdornment>
                                         ),
                                     }}
-                                    value={formik.values.password}
-                                    onChange={formik.handleChange}
+                                    value={adminFormik.values.password}
+                                    onChange={adminFormik.handleChange}
                                 />{" "}
                             </React.Fragment>
                         ) : (
@@ -70,8 +82,8 @@ export default function Home() {
                                 className={styles.input}
                                 label="Dni"
                                 variant="outlined"
-                                value={formik.values.dni}
-                                onChange={formik.handleChange}
+                                value={clientFormkik.values.dni}
+                                onChange={clientFormkik.handleChange}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -81,7 +93,9 @@ export default function Home() {
                                 }}
                             />
                         )}
-                        <Button variant="contained">Iniciar Sesión</Button>
+                        <Button variant="contained" type="submit">
+                            Iniciar Sesión
+                        </Button>
                         <Button
                             variant="contained"
                             color="secondary"
