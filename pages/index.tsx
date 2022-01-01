@@ -102,8 +102,8 @@ export default function Home() {
                             onClick={() => setAdminLogin(!adminLogin)}
                         >
                             {adminLogin
-                                ? "Ingresar como administrador"
-                                : "Ingresar como cliente"}
+                                ? "Ingresar como cliente"
+                                : "Ingresar como administrador "}
                         </Button>
                     </form>
                 </div>
