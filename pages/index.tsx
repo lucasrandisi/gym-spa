@@ -1,6 +1,6 @@
 import { Button, Card, InputAdornment, TextField } from "@mui/material";
 import React, { useState } from "react";
-import styles from "styles/index.module.scss";
+import styles from "styles/pages/index.module.scss";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import LockIcon from "@mui/icons-material/Lock";
 import { useFormik } from "formik";
