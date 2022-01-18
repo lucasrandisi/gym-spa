@@ -1,0 +1,8 @@
+{
+    "printWidth": 90,
+    "bracketSpacing": true,
+    "jsxBracketSameLine": true,
+    "arrowParens": "avoid",
+    "useTabs": true,
+    "tabWidth": 2
+}
