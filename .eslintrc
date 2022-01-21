@@ -3,8 +3,20 @@
     "airbnb",
     "next/core-web-vitals",
     "plugin:jsx-a11y/recommended",
-		"prettier",
-		"prettier/react"
+		"prettier"
   ],
-  "plugins": ["jsx-a11y", "prettier"]
+  "plugins": ["jsx-a11y", "prettier"],
+  "rules": {
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
+    "import/extensions": [
+       "error",
+       "ignorePackages",
+       {
+         "js": "never",
+         "jsx": "never",
+         "ts": "never",
+         "tsx": "never"
+       }
+    ]
+ }
 }
