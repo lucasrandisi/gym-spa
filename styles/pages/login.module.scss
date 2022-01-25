@@ -1,0 +1,55 @@
+.background {
+	min-height: 100vh;
+	background-color: #e6e6e6;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	.card {
+		width: 80%;
+		height: 80vh;
+		display: flex;
+
+		.leftContainer {
+			width: 50%;
+			padding: 17vh 8vw;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+
+			h1 {
+				text-align: center;
+				font-size: 3rem;
+				margin: 1vh;
+			}
+
+			h2 {
+				color: #a7a6ae;
+				text-align: center;
+			}
+
+			form {
+				width: 80%;
+
+				button {
+					margin-top: 5px;
+					width: 100%;
+				}
+			}
+		}
+
+		.rightContainer {
+			width: 50%;
+			position: relative;
+		}
+	}
+}
+
+.input {
+	margin-block: 4px;
+	width: 100%;
+}
+
+.error {
+	color: red;
+}
