@@ -1,34 +1,43 @@
-import { CssBaseline, List, ListItemButton, Box } from "@mui/material";
 import React from "react";
+import {
+	CssBaseline,
+	List,
+	ListItemButton,
+	Box,
+	ListItem,
+	ListItemIcon,
+	ListItemText,
+	Paper,
+} from "@mui/material";
 import logo from "public/images/logo.png";
 import Image from "next/image";
 import Link from "next/link";
 
 import { useRouter } from "next/router";
 import NavRoutes from "./NavRoutes";
-import styles from "./Nav.module.css";
 
 export default function Sidenav() {
 	const router = useRouter();
 
 	return (
-		<Box sx={{ display: "flex", bgcolor: "primary.main", width: "12vw" }}>
-			<CssBaseline />
-			<Image src={logo} alt="logo" layout="responsive" />
+		<Box sx={{ display: "flex" }}>
+			<Paper elevation={0} sx={{ maxWidth: 256 }}>
+				<CssBaseline />
+				<Image src={logo} alt="logo" layout="responsive" />
 
-			<List>
-				{NavRoutes.map(item => (
-					<Link href={item.path} key={item.title} passHref>
-						<ListItemButton
-							selected={router.pathname === item.path}
-							className={styles.item}
-						>
-							{item.icon}
-							<span>{item.title}</span>
-						</ListItemButton>
-					</Link>
-				))}
-			</List>
+				<List>
+					{NavRoutes.map(item => (
+						<ListItem key={item.id} disablePadding>
+							<Link href={item.path} passHref>
+								<ListItemButton selected={router.pathname === item.path}>
+									<ListItemIcon>{item.icon} </ListItemIcon>
+									<ListItemText primary={item.title} />
+								</ListItemButton>
+							</Link>
+						</ListItem>
+					))}
+				</List>
+			</Paper>
 		</Box>
 	);
 }
