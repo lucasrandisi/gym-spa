@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import * as Yup from "yup";
 import { Field, Form, Formik } from "formik";
 
 import { Button, InputAdornment, TextField } from "@mui/material";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import LockIcon from "@mui/icons-material/Lock";
+
+import { useAuthentication } from "session/AuthenticationProvider";
+import authService from "../../services/auth.service";
 
 const loginSchema = Yup.object().shape({
 	email: Yup.string().email("Ingrese un email válido").required("Requerido"),
@@ -19,53 +23,33 @@ const initialValues = {
 function LoginForm() {
 	const [state, setState] = useState({
 		loading: false,
-		response: null,
 		error: null,
 	});
+
+	const router = useRouter();
+	const auth = useAuthentication();
+
+	const login = async ({ email, password }: any) => {
+		setState({ ...state, loading: true });
+		authService
+			.login(email, password)
+			.then(() => {
+				auth.login();
+				router.push("/");
+			})
+			.catch(err => setState({ ...state, error: err }))
+			.finally(() => setState({ ...state, loading: false }));
+	};
 
 	return (
 		<div>
 			<div>
-				{state.error && "Error"}
+				{state.error && <div>{state.error}</div>}
 				{state.loading && <div>Loading...</div>}
 			</div>
 			<Formik
 				initialValues={initialValues}
-				onSubmit={({ email, password }) => {
-					setState({ ...state, loading: true });
-					const body = { username: email, password };
-					window.alert(JSON.stringify(body));
-
-					fetch("http://localhost:8080/api/login", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify(body),
-					})
-						.then(res => res.json())
-						.then(res => {
-							window.alert(JSON.stringify(res));
-							if (res.status !== 200) {
-								window.alert("!!!!!!!!!!!!!!!!	");
-								throw new Error(res.status);
-							}
-							return res;
-						})
-						.then(response =>
-							setState({
-								loading: false,
-								response,
-								error: null,
-							})
-						)
-						.catch(error =>
-							setState({
-								loading: false,
-								response: null,
-								error,
-							})
-						)
-						.finally(() => setState({ ...state, loading: false }));
-				}}
+				onSubmit={values => login(values)}
 				validationSchema={loginSchema}
 			>
 				{({ values, touched, errors }) => (
