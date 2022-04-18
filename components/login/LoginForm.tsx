@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useRouter } from "next/router";
 import * as Yup from "yup";
 import { Field, Form, Formik } from "formik";
 
@@ -7,8 +6,7 @@ import { Button, InputAdornment, TextField } from "@mui/material";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import LockIcon from "@mui/icons-material/Lock";
 
-import { useAuthentication } from "session/AuthenticationProvider";
-import authService from "../../services/auth.service";
+import { useAuth } from "security/auth.context";
 
 const loginSchema = Yup.object().shape({
 	email: Yup.string().email("Ingrese un email válido").required("Requerido"),
@@ -26,19 +24,12 @@ function LoginForm() {
 		error: null,
 	});
 
-	const router = useRouter();
-	const auth = useAuthentication();
+	const auth = useAuth();
 
 	const login = async ({ email, password }: any) => {
 		setState({ ...state, loading: true });
-		authService
-			.login(email, password)
-			.then(() => {
-				auth.login();
-				router.push("/");
-			})
-			.catch(err => setState({ ...state, error: err }))
-			.finally(() => setState({ ...state, loading: false }));
+		auth.login(email, password).catch(error => setState({ ...state, error }));
+		setState({ ...state, loading: false });
 	};
 
 	return (
@@ -50,8 +41,7 @@ function LoginForm() {
 			<Formik
 				initialValues={initialValues}
 				onSubmit={values => login(values)}
-				validationSchema={loginSchema}
-			>
+				validationSchema={loginSchema}>
 				{({ values, touched, errors }) => (
 					<Form>
 						<Field

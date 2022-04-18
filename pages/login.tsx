@@ -1,13 +1,22 @@
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import { Card } from "@mui/material";
 
 import styles from "styles/pages/login.module.scss";
 import portada from "public/images/portada.jpeg";
 import LoginForm from "components/login/LoginForm";
+import { useAuth } from "security/auth.context";
 
-function LoginPage() {
+const LoginPage = () => {
+	const router = useRouter();
+	const { isAuthenticated } = useAuth();
+
+	if (isAuthenticated) {
+		router.push("/");
+	}
+
 	return (
 		<div className={styles.background}>
 			<Card className={styles.card}>
@@ -22,6 +31,6 @@ function LoginPage() {
 			</Card>
 		</div>
 	);
-}
+};
 
 export default LoginPage;
