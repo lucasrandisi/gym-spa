@@ -8,13 +8,18 @@ import styles from "styles/pages/login.module.scss";
 import portada from "public/images/portada.jpeg";
 import LoginForm from "components/login/LoginForm";
 import { useAuth } from "security/auth.context";
+import { FullPageLoader } from "components/FullPageLoader";
 
-const LoginPage = () => {
+function LoginPage() {
 	const router = useRouter();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, isLoading } = useAuth();
 
-	if (isAuthenticated) {
+	if (!isLoading && isAuthenticated) {
 		router.push("/");
+	}
+
+	if (isLoading || isAuthenticated) {
+		return <FullPageLoader />;
 	}
 
 	return (
@@ -31,6 +36,6 @@ const LoginPage = () => {
 			</Card>
 		</div>
 	);
-};
+}
 
 export default LoginPage;
