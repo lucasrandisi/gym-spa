@@ -1,12 +1,7 @@
 import { useRouter } from "next/router";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import authService from "services/auth.service";
-import userService from "services/user.service";
-
-type User = {
-	email: string;
-	name: string;
-};
+import userService, { User } from "services/user.service";
 
 export interface UserContext {
 	user: User | null;
@@ -33,12 +28,21 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	const loadUser = async () => {
-		const token = localStorage.getItem("access_token");
+		var token = authService.getToken();
+
+		if (!token) {
+			await refresh();
+		}
+
+		token = authService.getToken();
 		if (token) {
 			setToken(token);
 			setIsAuthenticated(true);
+
 			const user = await userService.me();
-			if (user) setUser(user);
+			if (user) {
+				setUser(user);
+			}
 		}
 	};
 
@@ -55,15 +59,19 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const logout = () => {
-		localStorage.removeItem("access_token");
-		localStorage.removeItem("refresh_token");
-
 		authService.logout();
-
+		setToken(null);
 		setUser(null);
 		setLoading(false);
-
+		setIsAuthenticated(false);
 		router.push("/login");
+	};
+
+	const refresh = async (): Promise<void> => {
+		const token = authService.getRefreshToken();
+		if (token) {
+			await authService.refresh();
+		}
 	};
 
 	return (
