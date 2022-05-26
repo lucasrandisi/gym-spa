@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-import LoginForm from "./login";
+import React from "react";
 
 function Home() {
-	const [isLogged] = useState<boolean>(false);
-
-	return isLogged ? <div>Logeado</div> : <LoginForm />;
+	return <div>Home Page</div>;
 }
 
 export default Home;

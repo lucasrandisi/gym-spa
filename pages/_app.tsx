@@ -4,23 +4,26 @@ import theme from "styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
+import { AuthProvider } from "security/auth.context";
 
 type NextPageWithLayout = NextPage & {
-    getLayout?: (page: ReactElement) => ReactNode;
+	getLayout?: (page: ReactElement) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
-    Component: NextPageWithLayout;
+	Component: NextPageWithLayout;
 };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-    const getLayout = Component.getLayout ?? ((page) => page);
+	const getLayout = Component.getLayout ?? (page => page);
 
-    return (
-        <ThemeProvider theme={theme}>
-            {getLayout(<Component {...pageProps} />)}
-        </ThemeProvider>
-    );
+	return (
+		<AuthProvider>
+			<ThemeProvider theme={theme}>
+				{getLayout(<Component {...pageProps} />)}
+			</ThemeProvider>
+		</AuthProvider>
+	);
 }
 
 export default MyApp;
