@@ -53,9 +53,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			loadUser();
 		} catch (error: any) {
 			setUser(null);
-			throw error.message;
+			throw error;
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	};
 
 	const logout = () => {
