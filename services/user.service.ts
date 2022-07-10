@@ -1,9 +1,10 @@
 import { api } from "./api";
 
 export type User = {
-	id: number,
-	email: string;
+    id: number,
+    nroDoc: string,
 	name: string;
+	email: string;
 };
 
 class UserService{
