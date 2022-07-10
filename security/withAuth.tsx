@@ -4,8 +4,9 @@ import { useRouter } from "next/router";
 import { FullPageLoader } from "components/FullPageLoader";
 import { useAuth } from "./auth.context";
 
+
 const withAuth = (Component: NextComponentType) => {
-	function Auth() {
+    return function (props: object) {
 		const router = useRouter();
 		const { isAuthenticated, isLoading } = useAuth();
 
@@ -15,16 +16,10 @@ const withAuth = (Component: NextComponentType) => {
 
 		if (isLoading || !isAuthenticated) {
 			return <FullPageLoader />;
-		}
-
-		return <Component />;
+        }
+        
+        return <Component {...props} />;
 	}
-
-	if (Component.getInitialProps) {
-		Auth.getInitialProps = Component.getInitialProps;
-	}
-
-	return Auth;
 };
 
 export default withAuth;
