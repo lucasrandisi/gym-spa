@@ -4,30 +4,24 @@ import { Assignment, Badge, FitnessCenter, Home, Settings } from "@mui/icons-mat
 const NavRoutes = [
 	{
 		id: 1,
-		title: "Inicio",
-		path: "/",
-		icon: <Home fontSize="large" />,
-	},
-	{
-		id: 2,
 		title: "Miembros",
-		path: "/clientes",
+		path: "/",
 		icon: <Badge fontSize="large" />,
 	},
 	{
-		id: 3,
+		id: 2,
 		title: "Rutinas",
 		path: "/rutinas",
 		icon: <Assignment fontSize="large" />,
 	},
 	{
-		id: 4,
+		id: 3,
 		title: "Ejercicios",
 		path: "/ejercicios",
 		icon: <FitnessCenter fontSize="large" />,
 	},
 	{
-		id: 5,
+		id: 4,
 		title: "Settings",
 		path: "/settings",
 		icon: <Settings fontSize="large" />,

@@ -20,8 +20,8 @@ export default function Sidenav() {
 	const router = useRouter();
 
 	return (
-		<Box sx={{ display: "flex" }}>
-			<Paper elevation={0} sx={{ maxWidth: 256 }}>
+		<Box sx={{ display: "flex", }}>
+			<Paper elevation={0} sx={{ width: "13vw" }}>
 				<CssBaseline />
 				<Image src={logo} alt="logo" layout="responsive" />
 
@@ -31,7 +31,7 @@ export default function Sidenav() {
 							<Link href={item.path} passHref>
 								<ListItemButton selected={router.pathname === item.path}>
 									<ListItemIcon>{item.icon} </ListItemIcon>
-									<ListItemText primary={item.title} />
+                                    <ListItemText primary={item.title} sx={{ fontSize: "1.4rem" }} disableTypography/>
 								</ListItemButton>
 							</Link>
 						</ListItem>
