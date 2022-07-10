@@ -5,6 +5,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import { AuthProvider } from "security/auth.context";
+import Head from "next/head";
 
 type NextPageWithLayout = NextPage & {
 	getLayout?: (page: ReactElement) => ReactNode;
@@ -17,12 +18,17 @@ type AppPropsWithLayout = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 	const getLayout = Component.getLayout ?? (page => page);
 
-	return (
-		<AuthProvider>
-			<ThemeProvider theme={theme}>
-				{getLayout(<Component {...pageProps} />)}
-			</ThemeProvider>
-		</AuthProvider>
+    return (
+        <>
+            <Head>
+                <meta name="viewport" content="initial-scale=1, width=device-width"/>
+            </Head>
+            <AuthProvider>
+                <ThemeProvider theme={theme}>
+                    {getLayout(<Component {...pageProps} />)}
+                </ThemeProvider>
+            </AuthProvider>
+        </>
 	);
 }
 
