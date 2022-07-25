@@ -1,5 +1,5 @@
 import React from "react";
-import { Assignment, Badge, FitnessCenter, Home, Settings } from "@mui/icons-material";
+import { Assignment, Badge, FitnessCenter, Settings } from "@mui/icons-material";
 
 const NavRoutes = [
 	{

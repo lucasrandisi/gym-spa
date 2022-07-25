@@ -1,5 +1,5 @@
 import React from "react";
 
-export const FullPageLoader = () => {
-	return <h1>Loading...</h1>;
-};
+const FullPageLoader = () => <h1>Loading...</h1>;
+
+export default FullPageLoader;
