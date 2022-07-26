@@ -1,12 +1,10 @@
 import React from "react";
-import { NextComponentType } from "next";
 import { useRouter } from "next/router";
-import { FullPageLoader } from "components/FullPageLoader";
+import FullPageLoader from "components/FullPageLoader";
 import { useAuth } from "./auth.context";
 
-
-const withAuth = (Component: NextComponentType) => {
-    return function (props: object) {
+const withAuth = <P extends object>(Component: React.ComponentType<P>) => {
+	const Redirect = (props: P) => {
 		const router = useRouter();
 		const { isAuthenticated, isLoading } = useAuth();
 
@@ -16,10 +14,12 @@ const withAuth = (Component: NextComponentType) => {
 
 		if (isLoading || !isAuthenticated) {
 			return <FullPageLoader />;
-        }
-        
-        return <Component {...props} />;
-	}
+		}
+
+		// eslint-disable-next-line react/jsx-props-no-spreading
+		return <Component {...props} />;
+	};
+	return Redirect;
 };
 
 export default withAuth;
