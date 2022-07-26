@@ -1,7 +1,16 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-shadow */
 import { useRouter } from "next/router";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import authService from "services/auth.service";
-import userService, { User } from "services/user.service";
+import React, {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
+import AuthService from "services/auth.service";
+import UserService, { User } from "services/user.service";
 
 export interface UserContext {
 	user: User | null;
@@ -22,72 +31,75 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const router = useRouter();
 
-	useEffect(() => {
-		loadUser();
-		setLoading(false);
-	}, []);
+	const refresh = async (): Promise<void> => {
+		const token = AuthService.getRefreshToken();
+		if (token) {
+			await AuthService.refresh();
+		}
+	};
 
-	const loadUser = async () => {
-		var token = authService.getToken();
+	const loadUser = useCallback(async () => {
+		let token = AuthService.getToken();
 
 		if (!token) {
 			await refresh();
 		}
 
-		token = authService.getToken();
+		token = AuthService.getToken();
 		if (token) {
 			setToken(token);
 			setIsAuthenticated(true);
 
-			const user = await userService.me();
+			const user = await UserService.me();
 			if (user) {
 				setUser(user);
 			}
 		}
-	};
+	}, []);
 
-	const login = async (username: string, password: string) => {
-		setLoading(true);
-		try {
-			await authService.login(username, password);
-			loadUser();
-		} catch (error: any) {
-			setUser(null);
-			throw error;
-		} finally {
-			setLoading(false);
-		}
-	};
+	const login = useCallback(
+		async (username: string, password: string) => {
+			setLoading(true);
+			try {
+				await AuthService.login(username, password);
+				loadUser();
+			} catch (error: any) {
+				setUser(null);
+				throw error;
+			} finally {
+				setLoading(false);
+			}
+		},
+		[loadUser]
+	);
 
-	const logout = () => {
-		authService.logout();
+	const logout = useCallback(() => {
+		AuthService.logout();
 		setToken(null);
 		setUser(null);
 		setLoading(false);
 		setIsAuthenticated(false);
 		router.push("/login");
-	};
+	}, [router]);
 
-	const refresh = async (): Promise<void> => {
-		const token = authService.getRefreshToken();
-		if (token) {
-			await authService.refresh();
-		}
-	};
+	useEffect(() => {
+		loadUser();
+		setLoading(false);
+	}, [loadUser]);
 
-	return (
-		<AuthContext.Provider
-			value={{
-				user,
-				isAuthenticated,
-				login,
-				logout,
-				isLoading: loading,
-				token,
-			}}>
-			{children}
-		</AuthContext.Provider>
+	const contextMemo = useMemo(
+		() => ({
+			user,
+			isAuthenticated,
+			login,
+			logout,
+			isLoading: loading,
+			token,
+		}),
+		[isAuthenticated, loading, login, logout, token, user]
 	);
+
+	return <AuthContext.Provider value={contextMemo}>{children}</AuthContext.Provider>;
 };
 
 const useAuth = () => useContext(AuthContext);
