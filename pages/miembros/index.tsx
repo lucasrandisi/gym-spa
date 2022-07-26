@@ -9,20 +9,63 @@ import Paper from "@mui/material/Paper";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 
-import UserService from "services/user.service";
+import UserService, { User } from "services/user.service";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import withAuth from "security/withAuth";
+import {
+	createColumnHelper,
+	useReactTable,
+	flexRender,
+	getCoreRowModel,
+	ColumnDef,
+} from "@tanstack/react-table";
+
+const columnHelper = createColumnHelper<User>();
+
+const columns: ColumnDef<User, any>[] = [
+	columnHelper.accessor("id", {
+		cell: info => info.getValue(),
+	}),
+	columnHelper.accessor("nroDoc", {
+		cell: info => info.getValue(),
+	}),
+	columnHelper.accessor("name", {
+		cell: info => info.getValue(),
+	}),
+	columnHelper.accessor("email", {
+		cell: info => info.getValue(),
+	}),
+	{
+		id: "actions",
+		cell: props => (
+			<div>
+				<Link href={`/miembros/${props.row.id}/rutina`} passHref>
+					<Button variant="contained">Rutina</Button>
+				</Link>
+				<Link href={`/miembros/${props.row.id}/editar`} passHref>
+					<IconButton aria-label="edit">
+						<EditIcon />
+					</IconButton>
+				</Link>
+			</div>
+		),
+	},
+];
 
 const UsersPage: any = () => {
-	const {
-		isLoading,
-		error,
-		data: miembros,
-	} = useQuery(["users"], async () => UserService.getAll());
+	const { isLoading, error, data } = useQuery(["users"], UserService.getAll, {
+		initialData: [],
+	});
+
+	const table = useReactTable({
+		data,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+	});
 
 	if (isLoading) return "Loading...";
 
@@ -35,36 +78,28 @@ const UsersPage: any = () => {
 			<TableContainer component={Paper}>
 				<Table>
 					<TableHead>
-						<TableRow>
-							<TableCell>Id</TableCell>
-							<TableCell>Dni</TableCell>
-							<TableCell>Nombre</TableCell>
-							<TableCell>Email</TableCell>
-						</TableRow>
+						{table.getHeaderGroups().map(headerGroup => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map(header => (
+									<TableCell key={header.id}>
+										{header.isPlaceholder
+											? null
+											: flexRender(header.column.columnDef.header, header.getContext())}
+									</TableCell>
+								))}
+							</TableRow>
+						))}
 					</TableHead>
 					<TableBody>
-						{miembros !== undefined
-							? miembros.map(miembro => (
-									<TableRow key={miembro.id}>
-										<TableCell>{miembro.id}</TableCell>
-										<TableCell>{miembro.nroDoc}</TableCell>
-										<TableCell>{miembro.name}</TableCell>
-										<TableCell>{miembro.email}</TableCell>
-										<TableCell>
-											<Link href={`/miembros/${miembro.id}/rutina`} passHref>
-												<Button variant="contained">Rutina</Button>
-											</Link>
-										</TableCell>
-										<TableCell>
-											<Link href={`/miembros/${miembro.id}/editar`} passHref>
-												<IconButton aria-label="edit">
-													<EditIcon />
-												</IconButton>
-											</Link>
-										</TableCell>
-									</TableRow>
-							  ))
-							: ""}
+						{table.getRowModel().rows.map(row => (
+							<TableRow key={row.id}>
+								{row.getVisibleCells().map(cell => (
+									<td key={cell.id}>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</td>
+								))}
+							</TableRow>
+						))}
 					</TableBody>
 				</Table>
 			</TableContainer>
