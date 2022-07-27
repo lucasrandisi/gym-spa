@@ -1,11 +1,5 @@
 import React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 
@@ -19,28 +13,38 @@ import withAuth from "security/withAuth";
 import {
 	createColumnHelper,
 	useReactTable,
-	flexRender,
+	getFilteredRowModel,
 	getCoreRowModel,
+	getPaginationRowModel,
 	ColumnDef,
+	FilterFn,
 } from "@tanstack/react-table";
+import { rankItem } from "@tanstack/match-sorter-utils";
+import DataTable from "components/table/Table";
+import DebouncedInput from "components/debounced";
 
 const columnHelper = createColumnHelper<User>();
 
 const columns: ColumnDef<User, any>[] = [
 	columnHelper.accessor("id", {
+		header: "ID",
 		cell: info => info.getValue(),
 	}),
 	columnHelper.accessor("nroDoc", {
+		header: "DNI",
 		cell: info => info.getValue(),
 	}),
 	columnHelper.accessor("name", {
+		header: "Nombre",
 		cell: info => info.getValue(),
 	}),
 	columnHelper.accessor("email", {
+		header: "Email",
 		cell: info => info.getValue(),
 	}),
 	{
 		id: "actions",
+		header: "Acciones",
 		cell: props => (
 			<div>
 				<Link href={`/miembros/${props.row.id}/rutina`} passHref>
@@ -56,7 +60,17 @@ const columns: ColumnDef<User, any>[] = [
 	},
 ];
 
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+	const itemRank = rankItem(row.getValue(columnId), value);
+	addMeta({
+		itemRank,
+	});
+	return itemRank.passed;
+};
+
 const UsersPage: any = () => {
+	const [globalFilter, setGlobalFilter] = React.useState("");
+
 	const { isLoading, error, data } = useQuery(["users"], UserService.getAll, {
 		initialData: [],
 	});
@@ -64,7 +78,15 @@ const UsersPage: any = () => {
 	const table = useReactTable({
 		data,
 		columns,
+		globalFilterFn: fuzzyFilter,
+		state: {
+			globalFilter,
+		},
 		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		enableColumnFilters: true,
+		enablePinning: true,
 	});
 
 	if (isLoading) return "Loading...";
@@ -74,35 +96,12 @@ const UsersPage: any = () => {
 	return (
 		<AuthLayout>
 			<Header title="Miembros" />
-
-			<TableContainer component={Paper}>
-				<Table>
-					<TableHead>
-						{table.getHeaderGroups().map(headerGroup => (
-							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map(header => (
-									<TableCell key={header.id}>
-										{header.isPlaceholder
-											? null
-											: flexRender(header.column.columnDef.header, header.getContext())}
-									</TableCell>
-								))}
-							</TableRow>
-						))}
-					</TableHead>
-					<TableBody>
-						{table.getRowModel().rows.map(row => (
-							<TableRow key={row.id}>
-								{row.getVisibleCells().map(cell => (
-									<td key={cell.id}>
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
-									</td>
-								))}
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
+			<DebouncedInput
+				value={globalFilter}
+				onChange={value => setGlobalFilter(String(value))}
+				placeholder="Buscar..."
+			/>
+			<DataTable table={table} />
 		</AuthLayout>
 	);
 };
