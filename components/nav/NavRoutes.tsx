@@ -1,31 +1,53 @@
 import React from "react";
-import { Assignment, Badge, FitnessCenter, Settings } from "@mui/icons-material";
+import {
+	AccountCircle,
+	Assignment,
+	Badge,
+	FitnessCenter,
+	Home,
+	Settings,
+} from "@mui/icons-material";
 
-const NavRoutes = [
+export const routes = [
+	{
+		id: 0,
+		title: "Home",
+		path: "/",
+		icon: <Home />,
+	},
 	{
 		id: 1,
 		title: "Miembros",
-		path: "/",
-		icon: <Badge fontSize="large" />,
+		path: "/miembros",
+		icon: <Badge />,
 	},
 	{
 		id: 2,
 		title: "Rutinas",
 		path: "/rutinas",
-		icon: <Assignment fontSize="large" />,
+		icon: <Assignment />,
 	},
 	{
 		id: 3,
 		title: "Ejercicios",
 		path: "/ejercicios",
-		icon: <FitnessCenter fontSize="large" />,
+		icon: <FitnessCenter />,
 	},
 	{
 		id: 4,
 		title: "Settings",
 		path: "/settings",
-		icon: <Settings fontSize="large" />,
+		icon: <Settings />,
 	},
 ];
 
-export default NavRoutes;
+export default routes;
+
+export const settings = [
+	{
+		id: 0,
+		title: "Profile",
+		path: "/profile",
+		icon: <AccountCircle />,
+	},
+];
