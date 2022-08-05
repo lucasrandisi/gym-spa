@@ -29,7 +29,9 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 	const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = event.target.value;
 		const filteredExercises = exercisesList.filter(exercise =>
-			exercise.name.toLocaleLowerCase().includes(searchValue)
+			exercise.name.toLocaleLowerCase().includes(searchValue) ||
+			exercise.muscleGroups.map(muscleGroup => muscleGroup.name.toLowerCase())
+				.some(muscleGroupName => muscleGroupName.includes(searchValue))
 		);
 
 		setName(searchValue);
@@ -47,7 +49,7 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 			<Header title="Ejercicios" />
 			<Box sx={{ mb: 4, px: 2, display: "flex", alignItems: "flex-end" }}>
 				<TextField
-					label="Buscar Nombre"
+					label="Buscar Nombre o Músculo"
 					variant="standard"
 					type="search"
 					value={name}
