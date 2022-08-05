@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { Exercise } from 'models/exercise';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
+import { Button } from '@mui/material';
 
 
 const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> }) => {
@@ -36,7 +37,7 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 	return (
 		<AuthLayout>
 			<Header title="Ejercicios" />
-			<Box sx={{ mb: 4, pl: 2 }}>
+			<Box sx={{ mb: 4, px: 2, display: "flex", alignItems: "flex-end" }}>
 				<TextField
 					label="Buscar Nombre"
 					variant="standard"
@@ -45,6 +46,11 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 					onChange={onSearchChange}
 					color="secondary"
 				/>
+				<Box sx={{ ml: "auto" }}>
+					<Link href="ejercicios/nuevo">
+						<Button variant="contained">Agregar</Button>
+					</Link>
+				</Box>
 			</Box>
 			<TableContainer component={Paper}>
 				<Table>
@@ -52,6 +58,8 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 						<TableRow>
 							<TableCell>Id</TableCell>
 							<TableCell>Nombre</TableCell>
+							<TableCell>Músculos</TableCell>
+							<TableCell />
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -59,6 +67,9 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 							<TableRow key={exercise.id}>
 								<TableCell>{exercise.id}</TableCell>
 								<TableCell>{exercise.name}</TableCell>
+								<TableCell>{exercise.muscleGroups.map(muscleGroup => muscleGroup.name)
+									.join(", ")}
+								</TableCell>
 								<TableCell>
 									<Link href={`/ejercicios/${exercise.id}`}>
 										<IconButton aria-label="edit">
@@ -71,7 +82,7 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 					</TableBody>
 				</Table>
 			</TableContainer>
-		</AuthLayout>
+		</AuthLayout >
 	);
 
 }
