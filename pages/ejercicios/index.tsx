@@ -18,11 +18,13 @@ import { Exercise } from 'models/exercise';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
 import { Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> }) => {
 	const [name, setName] = React.useState('');
 	const [exercises, setExercises] = React.useState(exercisesList);
+	const [openDeleteSnackbar, setOpenDeleteSnackbar] = React.useState(false);
 
 	const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = event.target.value;
@@ -33,6 +35,12 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 		setName(searchValue);
 		setExercises(filteredExercises);
 	};
+
+	async function deleteExercise(id: number) {
+		await api.delete(`/api/exercises/${id}`);
+
+		api.get(`api/exercises`).then(({ data }) => setExercises(data));
+	}
 
 	return (
 		<AuthLayout>
@@ -60,6 +68,7 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 							<TableCell>Nombre</TableCell>
 							<TableCell>Músculos</TableCell>
 							<TableCell />
+							<TableCell />
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -77,6 +86,11 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 										</IconButton>
 									</Link>
 								</TableCell>
+								<TableCell>
+									<IconButton onClick={() => deleteExercise(exercise.id)} aria-label="delete">
+										<DeleteIcon />
+									</IconButton>
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
@@ -90,7 +104,7 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 	const response = await api.get('/api/exercises', {
 		headers: {
-			Authorization: 'Bearer ' + req.cookies.access_token
+			Authorization: "Bearer " + req.cookies.access_token
 		}
 	});
 
