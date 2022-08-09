@@ -10,8 +10,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { routes } from "components/nav/NavRoutes";
+import { admin, routes } from "components/nav/NavRoutes";
 import { useRouter } from "next/router";
+import { Divider } from "@mui/material";
 
 const drawerWidth = 160;
 
@@ -69,9 +70,41 @@ const SideNavMenu = ({ open }: { open: boolean }) => {
 		<Drawer variant="permanent" open={open}>
 			<DrawerHeader />
 
-			<Box sx={{ flexGrow: 2, display: { xs: "none", md: "flex" } }}>
+			<Box
+				sx={{
+					flexGrow: 2,
+					display: { md: "flex", flexDirection: "column" },
+				}}>
 				<List>
 					{routes.map(route => (
+						<Link key={route.id} href={route.path} passHref>
+							<ListItem disablePadding sx={{ display: "block" }}>
+								<ListItemButton
+									selected={router.pathname === route.path}
+									sx={{
+										minHeight: 48,
+										justifyContent: open ? "initial" : "center",
+										px: 2.5,
+									}}>
+									<ListItemIcon
+										sx={{
+											minWidth: 0,
+											mr: open ? 3 : "auto",
+											justifyContent: "center",
+										}}>
+										{route.icon}
+									</ListItemIcon>
+									<ListItemText primary={route.title} sx={{ opacity: open ? 1 : 0 }} />
+								</ListItemButton>
+							</ListItem>
+						</Link>
+					))}
+				</List>
+
+				<Divider />
+
+				<List>
+					{admin.map(route => (
 						<Link key={route.id} href={route.path} passHref>
 							<ListItem disablePadding sx={{ display: "block" }}>
 								<ListItemButton
