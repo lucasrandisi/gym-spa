@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
@@ -9,7 +9,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import withAuth from "security/withAuth";
+
 import {
 	createColumnHelper,
 	useReactTable,
@@ -94,7 +94,7 @@ const UsersPage: any = () => {
 	if (error) return `An error has occurred: ${(error as Error).message}`;
 
 	return (
-		<AuthLayout>
+		<div>
 			<Header title="Miembros" />
 			<DebouncedInput
 				value={globalFilter}
@@ -102,8 +102,21 @@ const UsersPage: any = () => {
 				placeholder="Buscar..."
 			/>
 			<DataTable table={table} />
-		</AuthLayout>
+		</div>
 	);
 };
 
-export default withAuth(UsersPage);
+export default UsersPage;
+
+export async function getStaticProps() {
+	return {
+		props: {
+			isProtected: true,
+			userTypes: ["admin"],
+		},
+	};
+}
+
+UsersPage.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};

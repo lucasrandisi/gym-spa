@@ -1,37 +1,36 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 import { NextApiRequest } from "next/types";
-import React from "react";
-import withAuth from "security/withAuth";
+import React, { ReactElement } from "react";
 import { api } from "services/api";
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
-import Link from 'next/link';
-import { Exercise } from 'models/exercise';
-import TextField from '@mui/material/TextField';
-import { Box } from '@mui/system';
-import { Button } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import Link from "next/link";
+import { Exercise } from "models/exercise";
+import TextField from "@mui/material/TextField";
+import { Box } from "@mui/system";
+import { Button } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> }) => {
-	const [name, setName] = React.useState('');
+	const [name, setName] = React.useState("");
 	const [exercises, setExercises] = React.useState(exercisesList);
-	const [openDeleteSnackbar, setOpenDeleteSnackbar] = React.useState(false);
 
 	const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = event.target.value;
-		const filteredExercises = exercisesList.filter(exercise =>
-			exercise.name.toLocaleLowerCase().includes(searchValue) ||
-			exercise.muscleGroups.map(muscleGroup => muscleGroup.name.toLowerCase())
-				.some(muscleGroupName => muscleGroupName.includes(searchValue))
+		const filteredExercises = exercisesList.filter(
+			exercise =>
+				exercise.name.toLocaleLowerCase().includes(searchValue) ||
+				exercise.muscleGroups
+					.map(muscleGroup => muscleGroup.name.toLowerCase())
+					.some(muscleGroupName => muscleGroupName.includes(searchValue))
 		);
 
 		setName(searchValue);
@@ -74,12 +73,12 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{exercises.map((exercise) => (
+						{exercises.map(exercise => (
 							<TableRow key={exercise.id}>
 								<TableCell>{exercise.id}</TableCell>
 								<TableCell>{exercise.name}</TableCell>
-								<TableCell>{exercise.muscleGroups.map(muscleGroup => muscleGroup.name)
-									.join(", ")}
+								<TableCell>
+									{exercise.muscleGroups.map(muscleGroup => muscleGroup.name).join(", ")}
 								</TableCell>
 								<TableCell>
 									<Link href={`/ejercicios/${exercise.id}`}>
@@ -89,7 +88,9 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 									</Link>
 								</TableCell>
 								<TableCell>
-									<IconButton onClick={() => deleteExercise(exercise.id)} aria-label="delete">
+									<IconButton
+										onClick={() => deleteExercise(exercise.id)}
+										aria-label="delete">
 										<DeleteIcon />
 									</IconButton>
 								</TableCell>
@@ -98,23 +99,35 @@ const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> 
 					</TableBody>
 				</Table>
 			</TableContainer>
-		</AuthLayout >
+		</AuthLayout>
 	);
-
-}
+};
 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-	const response = await api.get('/api/exercises', {
+	const response = await api.get("/api/exercises", {
 		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
+			Authorization: `Bearer ${req.cookies.access_token}`,
+		},
 	});
 
 	return {
 		props: {
-			exercisesList: response.data
-		}
+			exercisesList: response.data,
+		},
 	};
 }
 
-export default withAuth(ExercisesPage);
+export default ExercisesPage;
+
+export async function getStaticProps() {
+	return {
+		props: {
+			isProtected: true,
+			userTypes: ["admin"],
+		},
+	};
+}
+
+ExercisesPage.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};
