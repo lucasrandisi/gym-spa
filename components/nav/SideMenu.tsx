@@ -10,9 +10,10 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { admin, routes } from "components/nav/NavRoutes";
+import { admin, routes, RouteType } from "components/nav/NavRoutes";
 import { useRouter } from "next/router";
 import { Divider } from "@mui/material";
+import { useAuth } from "security/auth.context";
 
 const drawerWidth = 160;
 
@@ -63,8 +64,39 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== "open" })
 	})
 );
 
-const SideNavMenu = ({ open }: { open: boolean }) => {
+const RouteGroup = ({ items, open }: { items: RouteType[]; open: boolean }) => {
 	const router = useRouter();
+	return (
+		<List>
+			{items.map((route: RouteType) => (
+				<Link key={route.id} href={route.path} passHref>
+					<ListItem disablePadding sx={{ display: "block" }}>
+						<ListItemButton
+							selected={router.pathname === route.path}
+							sx={{
+								minHeight: 48,
+								justifyContent: open ? "initial" : "center",
+								px: 2.5,
+							}}>
+							<ListItemIcon
+								sx={{
+									minWidth: 0,
+									mr: open ? 3 : "auto",
+									justifyContent: "center",
+								}}>
+								{route.icon}
+							</ListItemIcon>
+							<ListItemText primary={route.title} sx={{ opacity: open ? 1 : 0 }} />
+						</ListItemButton>
+					</ListItem>
+				</Link>
+			))}
+		</List>
+	);
+};
+
+const SideNavMenu = ({ open }: { open: boolean }) => {
+	const { user } = useAuth();
 
 	return (
 		<Drawer variant="permanent" open={open}>
@@ -75,59 +107,14 @@ const SideNavMenu = ({ open }: { open: boolean }) => {
 					flexGrow: 2,
 					display: { md: "flex", flexDirection: "column" },
 				}}>
-				<List>
-					{routes.map(route => (
-						<Link key={route.id} href={route.path} passHref>
-							<ListItem disablePadding sx={{ display: "block" }}>
-								<ListItemButton
-									selected={router.pathname === route.path}
-									sx={{
-										minHeight: 48,
-										justifyContent: open ? "initial" : "center",
-										px: 2.5,
-									}}>
-									<ListItemIcon
-										sx={{
-											minWidth: 0,
-											mr: open ? 3 : "auto",
-											justifyContent: "center",
-										}}>
-										{route.icon}
-									</ListItemIcon>
-									<ListItemText primary={route.title} sx={{ opacity: open ? 1 : 0 }} />
-								</ListItemButton>
-							</ListItem>
-						</Link>
-					))}
-				</List>
+				<RouteGroup items={routes} open={open} />
 
-				<Divider />
-
-				<List>
-					{admin.map(route => (
-						<Link key={route.id} href={route.path} passHref>
-							<ListItem disablePadding sx={{ display: "block" }}>
-								<ListItemButton
-									selected={router.pathname === route.path}
-									sx={{
-										minHeight: 48,
-										justifyContent: open ? "initial" : "center",
-										px: 2.5,
-									}}>
-									<ListItemIcon
-										sx={{
-											minWidth: 0,
-											mr: open ? 3 : "auto",
-											justifyContent: "center",
-										}}>
-										{route.icon}
-									</ListItemIcon>
-									<ListItemText primary={route.title} sx={{ opacity: open ? 1 : 0 }} />
-								</ListItemButton>
-							</ListItem>
-						</Link>
-					))}
-				</List>
+				{user?.roles.indexOf("admin") !== -1 && (
+					<div>
+						<Divider />
+						<RouteGroup items={admin} open={open} />
+					</div>
+				)}
 			</Box>
 		</Drawer>
 	);

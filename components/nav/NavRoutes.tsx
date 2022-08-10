@@ -9,6 +9,13 @@ import {
 	Settings,
 } from "@mui/icons-material";
 
+export type RouteType = {
+	id: number;
+	title: string;
+	path: string;
+	icon: any;
+};
+
 export const routes = [
 	{
 		id: 0,

@@ -25,7 +25,7 @@ const Auth = ({ children }: { children: any }) => {
 		userTypes &&
 		isAuthenticated &&
 		user?.roles &&
-		userTypes.indexOf(user.roles[0].name.toLowerCase()) === -1
+		!user.roles.some((r: string) => userTypes.includes(r))
 	) {
 		return <p>Sorry, you dont have access</p>;
 	}
