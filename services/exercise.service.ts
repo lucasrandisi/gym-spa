@@ -24,7 +24,7 @@ export default class ExerciseService {
 		return exercise;
 	}
 
-	static delete = async (id: number) => {
+	static delete = async (id: string) => {
 		await api.delete(`/api/exercises/${id}`);
 	};
 
