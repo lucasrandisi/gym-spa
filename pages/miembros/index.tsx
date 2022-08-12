@@ -17,11 +17,11 @@ import {
 	getCoreRowModel,
 	getPaginationRowModel,
 	ColumnDef,
-	FilterFn,
 } from "@tanstack/react-table";
-import { rankItem } from "@tanstack/match-sorter-utils";
+
 import DataTable from "components/table/Table";
 import DebouncedInput from "components/debounced";
+import fuzzyFilter from "components/table/fuzzyFilter";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -47,10 +47,10 @@ const columns: ColumnDef<User, any>[] = [
 		header: "Acciones",
 		cell: props => (
 			<div>
-				<Link href={`/miembros/${props.row.id}/rutina`} passHref>
+				<Link href={`/miembros/${props.row.original.id}/rutina`} passHref>
 					<Button variant="contained">Rutina</Button>
 				</Link>
-				<Link href={`/miembros/${props.row.id}/editar`} passHref>
+				<Link href={`/miembros/${props.row.original.id}/editar`} passHref>
 					<IconButton aria-label="edit">
 						<EditIcon />
 					</IconButton>
@@ -59,14 +59,6 @@ const columns: ColumnDef<User, any>[] = [
 		),
 	},
 ];
-
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-	const itemRank = rankItem(row.getValue(columnId), value);
-	addMeta({
-		itemRank,
-	});
-	return itemRank.passed;
-};
 
 const UsersPage: any = () => {
 	const [globalFilter, setGlobalFilter] = React.useState("");

@@ -7,11 +7,9 @@ import Button from "@mui/material/Button";
 import ExerciseService from "services/exercise.service";
 import { useQuery } from "@tanstack/react-query";
 import DebouncedInput from "components/debounced";
-import { rankItem } from "@tanstack/match-sorter-utils";
 import {
 	ColumnDef,
 	createColumnHelper,
-	FilterFn,
 	getCoreRowModel,
 	getFilteredRowModel,
 	getPaginationRowModel,
@@ -20,6 +18,7 @@ import {
 import { Exercise } from "models/exercise";
 import DataTable from "components/table/Table";
 import ExerciseTableActions from "components/exercise/Actions";
+import fuzzyFilter from "../../components/table/fuzzyFilter";
 
 const columnHelper = createColumnHelper<Exercise>();
 
@@ -38,14 +37,6 @@ const columns: ColumnDef<Exercise, any>[] = [
 		cell: props => <ExerciseTableActions row={props.row} />,
 	},
 ];
-
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-	const itemRank = rankItem(row.getValue(columnId), value);
-	addMeta({
-		itemRank,
-	});
-	return itemRank.passed;
-};
 
 const ExercisesPage: any = () => {
 	const [globalFilter, setGlobalFilter] = React.useState("");
