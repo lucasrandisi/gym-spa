@@ -1,15 +1,22 @@
-import { Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, styled, TextField } from "@mui/material";
+import {
+	Button,
+	FormControl,
+	InputLabel,
+	MenuItem,
+	OutlinedInput,
+	Select,
+	styled,
+	TextField,
+} from "@mui/material";
 import { useFormik } from "formik";
 import { MuscleGroup } from "models/muscle-group";
 import React from "react";
 
-
-
-const Form = styled('form')({
+const Form = styled("form")({
 	width: "30%",
 });
 
-export type ExerciseForm = {
+export type ExerciseFormType = {
 	name: String;
 	muscleGroupIds: Array<Number>;
 };
@@ -17,16 +24,20 @@ export type ExerciseForm = {
 type ExerciseFormProps = {
 	muscleGroups: Array<MuscleGroup>;
 	onSubmit: any;
-	initialValues: ExerciseForm
-}
+	initialValues: ExerciseFormType;
+};
 
-export function ExerciseForm({ muscleGroups, onSubmit, initialValues }: ExerciseFormProps) {
+export function ExerciseForm({
+	muscleGroups,
+	onSubmit,
+	initialValues,
+}: ExerciseFormProps) {
 	const formik = useFormik({
-		initialValues: initialValues,
-		onSubmit: onSubmit
+		initialValues,
+		onSubmit,
 	});
 	return (
-		<Form onSubmit={formik.handleSubmit} >
+		<Form onSubmit={formik.handleSubmit}>
 			<TextField
 				id="name"
 				name="name"
@@ -45,13 +56,9 @@ export function ExerciseForm({ muscleGroups, onSubmit, initialValues }: Exercise
 					multiple
 					value={formik.values.muscleGroupIds}
 					onChange={formik.handleChange}
-					input={<OutlinedInput label="Músculos" />}
-				>
+					input={<OutlinedInput label="Músculos" />}>
 					{muscleGroups.map((muscleGroup: any) => (
-						<MenuItem
-							key={muscleGroup.id}
-							value={muscleGroup.id}
-						>
+						<MenuItem key={muscleGroup.id} value={muscleGroup.id}>
 							{muscleGroup.name}
 						</MenuItem>
 					))}
