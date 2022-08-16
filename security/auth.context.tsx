@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
+import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import React, {
 	createContext,
@@ -39,6 +40,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const loadUser = useCallback(async () => {
+		const u = Cookies.get("user");
+		if (u) {
+			setUser(JSON.parse(u));
+			setIsAuthenticated(true);
+			return;
+		}
+
 		let token = AuthService.getToken();
 
 		if (!token) {
@@ -53,6 +61,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			const user = await UserService.me();
 			if (user) {
 				setUser(user);
+				Cookies.set("user", JSON.stringify(user));
 			}
 		}
 	}, []);
@@ -63,8 +72,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			try {
 				await AuthService.login(username, password);
 				loadUser();
+				setIsAuthenticated(true);
 			} catch (error: any) {
 				setUser(null);
+				setIsAuthenticated(false);
 				throw error;
 			} finally {
 				setLoading(false);

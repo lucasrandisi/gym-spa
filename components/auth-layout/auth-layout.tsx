@@ -34,6 +34,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
 	return (
 		<Box sx={{ display: "flex" }}>
+			<SideNavMenu open={open} />
 			<AppBar
 				position="fixed"
 				elevation={0}
@@ -123,9 +124,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 				</Toolbar>
 			</AppBar>
 
-			<SideNavMenu open={open} />
-
-			<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+			<Box component="main" sx={{ flexGrow: 1, pt: 8 }}>
 				<div style={{ padding: "1rem" }}>{children}</div>
 			</Box>
 		</Box>

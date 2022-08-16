@@ -1,120 +1,101 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { NextApiRequest } from "next/types";
-import React from "react";
-import withAuth from "security/withAuth";
-import { api } from "services/api";
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
-import Link from 'next/link';
-import { Exercise } from 'models/exercise';
-import TextField from '@mui/material/TextField';
-import { Box } from '@mui/system';
-import { Button } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { ReactElement } from "react";
+import Link from "next/link";
+import Box from "@mui/system/Box";
+import Button from "@mui/material/Button";
+import ExerciseService from "services/exercise.service";
+import { useQuery } from "@tanstack/react-query";
+import DebouncedInput from "components/debounced";
+import {
+	ColumnDef,
+	createColumnHelper,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
+import { Exercise } from "models/exercise";
+import DataTable from "components/table/Table";
+import ExerciseTableActions from "components/exercise/Actions";
+import fuzzyFilter from "../../components/table/fuzzyFilter";
 
+const columnHelper = createColumnHelper<Exercise>();
 
-const ExercisesPage: any = ({ exercisesList }: { exercisesList: Array<Exercise> }) => {
-	const [name, setName] = React.useState('');
-	const [exercises, setExercises] = React.useState(exercisesList);
-	const [openDeleteSnackbar, setOpenDeleteSnackbar] = React.useState(false);
+const columns: ColumnDef<Exercise, any>[] = [
+	columnHelper.accessor("id", {
+		header: "ID",
+		cell: info => info.getValue(),
+	}),
+	columnHelper.accessor("name", {
+		header: "Nombre",
+		cell: info => info.getValue(),
+	}),
+	{
+		id: "actions",
+		header: "Acciones",
+		cell: props => <ExerciseTableActions row={props.row} />,
+	},
+];
 
-	const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const searchValue = event.target.value;
-		const filteredExercises = exercisesList.filter(exercise =>
-			exercise.name.toLocaleLowerCase().includes(searchValue) ||
-			exercise.muscleGroups.map(muscleGroup => muscleGroup.name.toLowerCase())
-				.some(muscleGroupName => muscleGroupName.includes(searchValue))
-		);
+const ExercisesPage: any = () => {
+	const [globalFilter, setGlobalFilter] = React.useState("");
 
-		setName(searchValue);
-		setExercises(filteredExercises);
-	};
+	const { isLoading, error, data } = useQuery(["excercises"], ExerciseService.getAll, {
+		initialData: [],
+	});
 
-	async function deleteExercise(id: number) {
-		await api.delete(`/api/exercises/${id}`);
+	const table = useReactTable({
+		data,
+		columns,
+		globalFilterFn: fuzzyFilter,
+		state: {
+			globalFilter,
+		},
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		enableColumnFilters: true,
+	});
 
-		api.get(`api/exercises`).then(({ data }) => setExercises(data));
-	}
+	if (isLoading) return "Loading...";
+
+	if (error) return `An error has occurred: ${(error as Error).message}`;
 
 	return (
-		<AuthLayout>
+		<div>
 			<Header title="Ejercicios" />
 			<Box sx={{ mb: 4, px: 2, display: "flex", alignItems: "flex-end" }}>
-				<TextField
-					label="Buscar Nombre o Músculo"
-					variant="standard"
+				<DebouncedInput
+					value={globalFilter}
+					onChange={value => setGlobalFilter(String(value))}
+					placeholder="Buscar..."
 					type="search"
-					value={name}
-					onChange={onSearchChange}
-					color="secondary"
 				/>
+
 				<Box sx={{ ml: "auto" }}>
-					<Link href="ejercicios/nuevo">
+					<Link href="ejercicios/nuevo" passHref>
 						<Button variant="contained">Agregar</Button>
 					</Link>
 				</Box>
 			</Box>
-			<TableContainer component={Paper}>
-				<Table>
-					<TableHead>
-						<TableRow>
-							<TableCell>Id</TableCell>
-							<TableCell>Nombre</TableCell>
-							<TableCell>Músculos</TableCell>
-							<TableCell />
-							<TableCell />
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{exercises.map((exercise) => (
-							<TableRow key={exercise.id}>
-								<TableCell>{exercise.id}</TableCell>
-								<TableCell>{exercise.name}</TableCell>
-								<TableCell>{exercise.muscleGroups.map(muscleGroup => muscleGroup.name)
-									.join(", ")}
-								</TableCell>
-								<TableCell>
-									<Link href={`/ejercicios/${exercise.id}`}>
-										<IconButton aria-label="edit">
-											<EditIcon />
-										</IconButton>
-									</Link>
-								</TableCell>
-								<TableCell>
-									<IconButton onClick={() => deleteExercise(exercise.id)} aria-label="delete">
-										<DeleteIcon />
-									</IconButton>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
-		</AuthLayout >
+
+			<DataTable table={table} />
+		</div>
 	);
+};
 
-}
+export default ExercisesPage;
 
-export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-	const response = await api.get('/api/exercises', {
-		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
-	});
-
+export async function getStaticProps() {
 	return {
 		props: {
-			exercisesList: response.data
-		}
+			isProtected: true,
+			userTypes: ["admin"],
+		},
 	};
 }
 
-export default withAuth(ExercisesPage);
+ExercisesPage.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};

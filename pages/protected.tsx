@@ -1,6 +1,19 @@
-import React from "react";
-import withAuth from "security/withAuth";
+import AuthLayout from "components/auth-layout/auth-layout";
+import React, { ReactElement } from "react";
 
-const MyPage = () => <> My private page</>;
+const Dashboard = () => <h1> My private page only for admins</h1>;
 
-export default withAuth(MyPage);
+export async function getStaticProps() {
+	return {
+		props: {
+			isProtected: true,
+			userTypes: ["admin"],
+		},
+	};
+}
+
+export default Dashboard;
+
+Dashboard.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};
