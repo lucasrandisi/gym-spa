@@ -6,8 +6,16 @@ import {
 	Badge,
 	FitnessCenter,
 	Home,
+	PersonAdd,
 	Settings,
 } from "@mui/icons-material";
+
+export type RouteType = {
+	id: number;
+	title: string;
+	path: string;
+	icon: any;
+};
 
 export const routes = [
 	{
@@ -56,5 +64,14 @@ export const settings = [
 		title: "Profile",
 		path: "/profile",
 		icon: <AccountCircle />,
+	},
+];
+
+export const admin = [
+	{
+		id: 0,
+		title: "Roles",
+		path: "/protected",
+		icon: <PersonAdd />,
 	},
 ];
