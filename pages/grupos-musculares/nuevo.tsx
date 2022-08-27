@@ -4,8 +4,7 @@ import Header from "components/header/header";
 import { MuscleGroupForm } from "components/muscle-groups/MuscleGroupForm";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import withAuth from "security/withAuth";
+import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
 
@@ -28,7 +27,7 @@ const NewMuscleGroup: any = () => {
 	}
 
 	return (
-		<AuthLayout>
+		<>
 			<Header title="Grupos Musculares" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<MuscleGroupForm
@@ -41,12 +40,9 @@ const NewMuscleGroup: any = () => {
 				message="Grupo Muscular registrado"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
-		</AuthLayout>
+		</>
 	);
 }
-
-
-export default withAuth(NewMuscleGroup);
 
 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
@@ -58,7 +54,16 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 
 	return {
 		props: {
-			muscleGroups: response.data
+			muscleGroups: response.data,
+			isProtected: true,
+			userTypes: ["admin"],
 		}
 	};
 }
+
+
+export default NewMuscleGroup;
+
+NewMuscleGroup.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};

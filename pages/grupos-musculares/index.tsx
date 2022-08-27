@@ -8,8 +8,7 @@ import Paper from '@mui/material/Paper';
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 import { NextApiRequest } from "next/types";
-import React from "react";
-import withAuth from "security/withAuth";
+import React, { ReactElement } from "react";
 import { api } from "services/api";
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
@@ -43,7 +42,7 @@ const MuscleGroupsPage: any = ({ muscleGroupsList }: { muscleGroupsList: Array<M
 	}
 
 	return (
-		<AuthLayout>
+		<>
 			<Header title="Grupos Musculares" />
 			<Box sx={{ mb: 4, px: 2, display: "flex", alignItems: "flex-end" }}>
 				<TextField
@@ -97,10 +96,11 @@ const MuscleGroupsPage: any = ({ muscleGroupsList }: { muscleGroupsList: Array<M
 				message="Grupo Muscular eliminado"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
-		</AuthLayout >
+		</>
 	);
 
 }
+
 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 	const response = await api.get('/api/muscle-groups', {
@@ -111,9 +111,15 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 
 	return {
 		props: {
-			muscleGroupsList: response.data
+			muscleGroupsList: response.data,
+			isProtected: true,
+			userTypes: ["admin"],
 		}
 	};
 }
 
-export default withAuth(MuscleGroupsPage);
+export default MuscleGroupsPage;
+
+MuscleGroupsPage.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};

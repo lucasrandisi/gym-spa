@@ -1,7 +1,9 @@
 import { Rol } from "./rol"
 
 export type User = {
-    id: number,
-    email: string,
-    roles: Array<Rol>
+	id: number,
+	nroDoc: string;
+	name: string;
+	email: string,
+	roles: Array<Rol>
 }

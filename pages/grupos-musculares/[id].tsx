@@ -1,14 +1,11 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { ExerciseForm } from "components/exercise/ExerciseForm";
 import Header from "components/header/header";
 import { MuscleGroupForm } from "components/muscle-groups/MuscleGroupForm";
-import { Exercise } from "models/exercise";
 import { MuscleGroup } from "models/muscle-group";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import withAuth from "security/withAuth";
+import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
 type EditMuscleGroupProps = {
@@ -33,7 +30,7 @@ const EditMuscleGroup: any = ({ muscleGroup }: EditMuscleGroupProps) => {
 	}
 
 	return (
-		<AuthLayout>
+		<>
 			<Header title="Grupos Musculares" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<MuscleGroupForm
@@ -46,13 +43,9 @@ const EditMuscleGroup: any = ({ muscleGroup }: EditMuscleGroupProps) => {
 				message="Grupo Muscular actualizado"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
-		</AuthLayout>
+		</>
 	);
 }
-
-
-export default withAuth(EditMuscleGroup);
-
 
 export async function getServerSideProps({ req, params }: { req: NextApiRequest, params: { id: string } }) {
 	console.log(params.id);
@@ -62,10 +55,17 @@ export async function getServerSideProps({ req, params }: { req: NextApiRequest,
 		}
 	});
 
-	console.log(muscleGroupResponse.data);
 	return {
 		props: {
-			muscleGroup: muscleGroupResponse.data
+			muscleGroup: muscleGroupResponse.data,
+			isProtected: true,
+			userTypes: ["admin"],
 		}
 	};
 }
+
+export default EditMuscleGroup;
+
+EditMuscleGroup.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};
