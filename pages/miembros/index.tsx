@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
@@ -9,7 +9,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import withAuth from "security/withAuth";
+
 import {
 	createColumnHelper,
 	useReactTable,
@@ -17,11 +17,11 @@ import {
 	getCoreRowModel,
 	getPaginationRowModel,
 	ColumnDef,
-	FilterFn,
 } from "@tanstack/react-table";
-import { rankItem } from "@tanstack/match-sorter-utils";
+
 import DataTable from "components/table/Table";
 import DebouncedInput from "components/debounced";
+import fuzzyFilter from "components/table/fuzzyFilter";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -47,10 +47,10 @@ const columns: ColumnDef<User, any>[] = [
 		header: "Acciones",
 		cell: props => (
 			<div>
-				<Link href={`/miembros/${props.row.id}/rutina`} passHref>
+				<Link href={`/miembros/${props.row.original.id}/rutina`} passHref>
 					<Button variant="contained">Rutina</Button>
 				</Link>
-				<Link href={`/miembros/${props.row.id}/editar`} passHref>
+				<Link href={`/miembros/${props.row.original.id}/editar`} passHref>
 					<IconButton aria-label="edit">
 						<EditIcon />
 					</IconButton>
@@ -59,14 +59,6 @@ const columns: ColumnDef<User, any>[] = [
 		),
 	},
 ];
-
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-	const itemRank = rankItem(row.getValue(columnId), value);
-	addMeta({
-		itemRank,
-	});
-	return itemRank.passed;
-};
 
 const UsersPage: any = () => {
 	const [globalFilter, setGlobalFilter] = React.useState("");
@@ -94,7 +86,7 @@ const UsersPage: any = () => {
 	if (error) return `An error has occurred: ${(error as Error).message}`;
 
 	return (
-		<AuthLayout>
+		<div>
 			<Header title="Miembros" />
 			<DebouncedInput
 				value={globalFilter}
@@ -102,8 +94,21 @@ const UsersPage: any = () => {
 				placeholder="Buscar..."
 			/>
 			<DataTable table={table} />
-		</AuthLayout>
+		</div>
 	);
 };
 
-export default withAuth(UsersPage);
+export default UsersPage;
+
+export async function getStaticProps() {
+	return {
+		props: {
+			isProtected: true,
+			userTypes: ["admin"],
+		},
+	};
+}
+
+UsersPage.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};

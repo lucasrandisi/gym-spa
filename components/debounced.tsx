@@ -1,3 +1,4 @@
+import TextField from "@mui/material/TextField";
 import React from "react";
 
 type DebouncedInputProps = {
@@ -29,6 +30,13 @@ export default function DebouncedInput({
 		return () => clearTimeout(timeout);
 	}, [debounce, onChange, value]);
 
-	// eslint-disable-next-line react/jsx-props-no-spreading
-	return <input {...props} value={value} onChange={e => setValue(e.target.value)} />;
+	return (
+		<TextField
+			// eslint-disable-next-line react/jsx-props-no-spreading
+			{...props}
+			value={value}
+			onChange={e => setValue(e.target.value)}
+			variant="standard"
+		/>
+	);
 }

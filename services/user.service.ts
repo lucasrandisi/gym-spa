@@ -5,6 +5,7 @@ export type User = {
 	nroDoc: string;
 	name: string;
 	email: string;
+	roles: string[];
 };
 
 class UserService {

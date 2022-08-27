@@ -3,15 +3,15 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import theme from "styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
-import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "security/auth.context";
 import Head from "next/head";
+import Auth from "security/auth";
 
 type NextPageWithLayout = NextPage & {
 	// eslint-disable-next-line no-unused-vars
-	getLayout?: (page: ReactElement) => ReactNode;
+	getLayout?: (page: any) => any;
 };
 
 type AppPropsWithLayout = AppProps & {
@@ -31,7 +31,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 			<QueryClientProvider client={queryClient}>
 				<AuthProvider>
 					<ThemeProvider theme={theme}>
-						{getLayout(<Component {...pageProps} />)}
+						{getLayout(
+							<Auth>
+								<Component {...pageProps} />
+							</Auth>
+						)}
 					</ThemeProvider>
 				</AuthProvider>
 			</QueryClientProvider>

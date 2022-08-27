@@ -1,42 +1,50 @@
 import { Box, Snackbar } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { ExerciseForm } from "components/exercise/ExerciseForm";
+import { ExerciseForm, ExerciseFormType } from "components/exercise/ExerciseForm";
 import Header from "components/header/header";
-import { MuscleGroup } from "models/muscle-group";
-import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import withAuth from "security/withAuth";
-import { api } from "services/api";
+import React, { ReactElement, useState } from "react";
+import ExerciseService from "services/exercise.service";
 
-
-const NewExercise: any = ({ muscleGroups }: { muscleGroups: Array<MuscleGroup> }) => {
-	const router = useRouter()
+const NewExercise: any = () => {
+	const router = useRouter();
+	const queryClient = useQueryClient();
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: ExerciseForm = {
+	const muscleGroups = useQuery(["muscles-groups"], ExerciseService.getAllMuscles, {
+		initialData: [],
+		// cacheTime: 2000,
+	});
+
+	const initialValues: ExerciseFormType = {
 		name: "",
-		muscleGroupIds: []
+		muscleGroupIds: [],
 	};
 
-	function onSubmit(values: ExerciseForm) {
-		api.post("/api/exercises", values)
-			.then(() => {
+	const mutation = useMutation(
+		["create-exercise"],
+		(values: ExerciseFormType) => ExerciseService.create(values),
+		{
+			onError: () => {
 				setOpenSnackbar(true);
-
-				setTimeout(() => router.push("/ejercicios"), 2000);
-
-			});
-	}
+			},
+			onSuccess: async data => {
+				queryClient.setQueryData(["excercises"], (old: any) => [...old, data]);
+				setOpenSnackbar(true);
+			},
+			onSettled: () => router.push("/ejercicios"),
+		}
+	);
 
 	return (
-		<AuthLayout>
+		<div>
 			<Header title="Ejercicios" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<ExerciseForm
-					muscleGroups={muscleGroups}
+					muscleGroups={muscleGroups.data}
 					initialValues={initialValues}
-					onSubmit={onSubmit}
+					onSubmit={mutation.mutate}
 				/>
 			</Box>
 			<Snackbar
@@ -44,24 +52,21 @@ const NewExercise: any = ({ muscleGroups }: { muscleGroups: Array<MuscleGroup> }
 				message="Ejercicio registrado"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
-		</AuthLayout>
+		</div>
 	);
-}
+};
 
+export default NewExercise;
 
-export default withAuth(NewExercise);
-
-
-export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-	const response = await api.get("/api/muscle-groups", {
-		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
-	});
-
+export async function getStaticProps() {
 	return {
 		props: {
-			muscleGroups: response.data
-		}
+			isProtected: true,
+			userTypes: ["admin"],
+		},
 	};
 }
+
+NewExercise.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};

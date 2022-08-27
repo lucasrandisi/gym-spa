@@ -1,48 +1,59 @@
-import { Box, Snackbar } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import Box from "@mui/material/Box";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { ExerciseForm } from "components/exercise/ExerciseForm";
+import { ExerciseForm, ExerciseFormType } from "components/exercise/ExerciseForm";
 import Header from "components/header/header";
-import { Exercise } from "models/exercise";
-import { MuscleGroup } from "models/muscle-group";
-import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import withAuth from "security/withAuth";
-import { api } from "services/api";
+import React, { ReactElement, useState } from "react";
+import ExerciseService from "services/exercise.service";
 
-type EditExerciseProps = {
-	exercise: Exercise;
-	muscleGroups: Array<MuscleGroup>
-}
-
-
-const EditExercise: any = ({ exercise, muscleGroups }: EditExerciseProps) => {
-	const router = useRouter()
+const EditExercise: any = () => {
+	const router = useRouter();
+	const { id } = router.query;
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: ExerciseForm = {
-		name: exercise.name,
-		muscleGroupIds: exercise.muscleGroups.map(muscleGroup => muscleGroup.id)
-	};
+	const exercise = useQuery(["excercise"], () => ExerciseService.get(id as string));
 
-	function onSubmit(values: ExerciseForm) {
-		api.put(`/api/exercises/${exercise.id}`, values)
-			.then(() => {
+	const muscleGroups = useQuery(["muscles-groups"], ExerciseService.getAllMuscles, {
+		initialData: [],
+	});
+
+	const mutation = useMutation(
+		["edit-exercise"],
+		(values: ExerciseFormType) => ExerciseService.edit(id as string, values),
+		{
+			onError: () => {
 				setOpenSnackbar(true);
+				setTimeout(() => router.push("/ejercicios"), 2000);
+			},
+			onSuccess: () => {
+				setOpenSnackbar(true);
+				setTimeout(() => router.push("/ejercicios"), 2000);
+			},
+		}
+	);
 
-				setTimeout(() => router.push("/ejercicios"), 1000);
-			});
+	if (!exercise.data) {
+		return <div>Loading...</div>;
 	}
+
+	const initialValues: ExerciseFormType = {
+		name: exercise.data.name,
+		muscleGroupIds: exercise.data.muscleGroups.map(g => g.id),
+	};
 
 	return (
 		<AuthLayout>
 			<Header title="Ejercicios" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
-				<ExerciseForm
-					muscleGroups={muscleGroups}
-					initialValues={initialValues}
-					onSubmit={onSubmit}
-				/>
+				{exercise.data && (
+					<ExerciseForm
+						muscleGroups={muscleGroups.data}
+						initialValues={initialValues}
+						onSubmit={mutation.mutate}
+					/>
+				)}
 			</Box>
 			<Snackbar
 				open={openSnackbar}
@@ -51,30 +62,26 @@ const EditExercise: any = ({ exercise, muscleGroups }: EditExerciseProps) => {
 			/>
 		</AuthLayout>
 	);
-}
+};
 
+export default EditExercise;
 
-export default withAuth(EditExercise);
-
-
-export async function getServerSideProps({ req, params }: { req: NextApiRequest, params: { id: string } }) {
-	const [muscleGroupsResponse, exerciseResponse] = await Promise.all([
-		api.get("/api/muscle-groups", {
-			headers: {
-				Authorization: "Bearer " + req.cookies.access_token
-			}
-		}),
-		api.get(`/api/exercises/${params.id}`, {
-			headers: {
-				Authorization: "Bearer " + req.cookies.access_token
-			}
-		})
-	]);
-
+export async function getStaticPaths() {
 	return {
-		props: {
-			exercise: exerciseResponse.data,
-			muscleGroups: muscleGroupsResponse.data
-		}
+		paths: [],
+		fallback: true,
 	};
 }
+
+export async function getStaticProps() {
+	return {
+		props: {
+			isProtected: true,
+			userTypes: ["admin"],
+		},
+	};
+}
+
+EditExercise.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};
