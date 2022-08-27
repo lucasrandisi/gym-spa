@@ -39,7 +39,7 @@ const EditRoutine: any = ({ routine }: EditRoutineProps) => {
 
 	return (
 		<>
-			<Header title="Rtuinas" />
+			<Header title="Rutinas" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<RoutineForm
 					initialValues={initialValues}
