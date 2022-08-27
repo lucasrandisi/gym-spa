@@ -66,7 +66,7 @@ export function ExerciseForm({
 			</FormControl>
 
 			<Button color="primary" variant="contained" type="submit" fullWidth>
-				Submit
+				Guardar
 			</Button>
 		</Form>
 	);
