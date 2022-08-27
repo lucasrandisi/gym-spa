@@ -3,21 +3,27 @@ import { useFormik } from "formik";
 import React from "react";
 
 
-
 const Form = styled('form')({
 	width: "30%",
 });
 
-export type MuscleGroupFormType = {
+
+export type RoutineFormType = {
 	name: String;
+	routineExercises: Array<{
+		exerciseId: number,
+		day: number,
+		sets: number,
+		reps: number
+	}>
 };
 
-type MuscleGroupFormProps = {
+type RoutineFormProps = {
 	onSubmit: any;
-	initialValues: MuscleGroupFormType
+	initialValues: RoutineFormType
 }
 
-export function MuscleGroupForm({ onSubmit, initialValues }: MuscleGroupFormProps) {
+export function RoutineForm({ onSubmit, initialValues }: RoutineFormProps) {
 	const formik = useFormik({
 		initialValues: initialValues,
 		onSubmit: onSubmit

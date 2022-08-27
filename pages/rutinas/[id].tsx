@@ -1,46 +1,54 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { MuscleGroupForm, MuscleGroupFormType } from "components/muscle-groups/MuscleGroupForm";
-import { MuscleGroup } from "models/muscle-group";
+import { RoutineForm, RoutineFormType } from "components/routines/RoutinesForm";
+import { Routine } from "models/routine";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
 import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
-type EditMuscleGroupProps = {
-	muscleGroup: MuscleGroup;
+type EditRoutineProps = {
+	routine: Routine;
 }
 
-const EditMuscleGroup: any = ({ muscleGroup }: EditMuscleGroupProps) => {
+const EditRoutine: any = ({ routine }: EditRoutineProps) => {
 	const router = useRouter()
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: MuscleGroupFormType = {
-		name: muscleGroup.name,
+	const initialValues: RoutineFormType = {
+		name: routine.name,
+		routineExercises: routine.routineExercises.map(routineExercise => {
+			return {
+				exerciseId: routineExercise.exercise.id,
+				day: routineExercise.day,
+				sets: routineExercise.sets,
+				reps: routineExercise.reps
+			}
+		})
 	};
 
-	function onSubmit(values: MuscleGroupFormType) {
-		api.put(`/api/muscle-groups/${muscleGroup.id}`, values)
+	function onSubmit(values: RoutineFormType) {
+		api.put(`/api/routines/${routine.id}`, values)
 			.then(() => {
 				setOpenSnackbar(true);
 
-				setTimeout(() => router.push("/grupos-musculares"), 1000);
+				setTimeout(() => router.push("/rutinas"), 1000);
 			});
 	}
 
 	return (
 		<>
-			<Header title="Grupos Musculares" />
+			<Header title="Rtuinas" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
-				<MuscleGroupForm
+				<RoutineForm
 					initialValues={initialValues}
 					onSubmit={onSubmit}
 				/>
 			</Box>
 			<Snackbar
 				open={openSnackbar}
-				message="Grupo Muscular actualizado"
+				message="Rutina actualizada"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
 		</>
@@ -48,8 +56,7 @@ const EditMuscleGroup: any = ({ muscleGroup }: EditMuscleGroupProps) => {
 }
 
 export async function getServerSideProps({ req, params }: { req: NextApiRequest, params: { id: string } }) {
-	console.log(params.id);
-	const muscleGroupResponse = await api.get(`/api/muscle-groups/${params.id}`, {
+	const routineResponse = await api.get(`/api/routines/${params.id}`, {
 		headers: {
 			Authorization: "Bearer " + req.cookies.access_token
 		}
@@ -57,15 +64,15 @@ export async function getServerSideProps({ req, params }: { req: NextApiRequest,
 
 	return {
 		props: {
-			muscleGroup: muscleGroupResponse.data,
+			routine: routineResponse.data,
 			isProtected: true,
 			userTypes: ["admin"],
 		}
 	};
 }
 
-export default EditMuscleGroup;
+export default EditRoutine;
 
-EditMuscleGroup.getLayout = function getLayout(page: ReactElement) {
+EditRoutine.getLayout = function getLayout(page: ReactElement) {
 	return <AuthLayout>{page}</AuthLayout>;
 };
