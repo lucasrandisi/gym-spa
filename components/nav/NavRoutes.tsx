@@ -1,5 +1,6 @@
 import React from "react";
 import {
+	Accessibility,
 	AccountCircle,
 	Assignment,
 	Badge,
@@ -35,6 +36,12 @@ export const routes = [
 	},
 	{
 		id: 4,
+		title: "Grupos Musculares",
+		path: "/grupos-musculares",
+		icon: <Accessibility />,
+	},
+	{
+		id: 5,
 		title: "Settings",
 		path: "/settings",
 		icon: <Settings />,
