@@ -59,7 +59,7 @@ export function ExerciseForm({ muscleGroups, onSubmit, initialValues }: Exercise
 			</FormControl>
 
 			<Button color="primary" variant="contained" type="submit" fullWidth>
-				Submit
+				Guardar
 			</Button>
 		</Form>
 	);
