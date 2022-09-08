@@ -5,6 +5,7 @@ import theme from "styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { NextPage } from "next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SnackbarProvider } from "notistack";
 import { AuthProvider } from "security/auth.context";
 import Head from "next/head";
 import Auth from "security/auth";
@@ -31,11 +32,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 			<QueryClientProvider client={queryClient}>
 				<AuthProvider>
 					<ThemeProvider theme={theme}>
-						{getLayout(
-							<Auth>
-								<Component {...pageProps} />
-							</Auth>
-						)}
+						<SnackbarProvider maxSnack={3}>
+							{getLayout(
+								<Auth>
+									<Component {...pageProps} />
+								</Auth>
+							)}
+						</SnackbarProvider>
 					</ThemeProvider>
 				</AuthProvider>
 			</QueryClientProvider>
