@@ -14,8 +14,19 @@ const NewRoutine: any = ({exercises} : {exercises: Array<Exercise>}) => {
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
     function onSubmit(values: RoutineForm) {
-        console.log("Create Routine", values);
-		api.post("/api/routines", values)
+        const body = {
+            name: values.name,
+            exercises: values.newRoutineExercises.map(newExerciseRoutine => {
+                return {
+                    exerciseId: newExerciseRoutine.exercise.id,
+                    day: newExerciseRoutine.day,
+                    sets: newExerciseRoutine.sets,
+                    reps: newExerciseRoutine.reps
+                };
+            })
+        }
+
+        api.post("/api/routines", body)
 			.then(() => {
 				setOpenSnackbar(true);
 

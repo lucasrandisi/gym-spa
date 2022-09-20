@@ -40,20 +40,25 @@ export function RoutineForm({ exercises, onSubmit, routineExercises }: RoutineFo
 
     const routineFormik = useFormik({
         initialValues: {
-            name: undefined,
+            name: "",
         },
         validationSchema: yup.object({
             name: yup.string().required(),
         }),
-        onSubmit: onSubmit
+        onSubmit: () => {
+            onSubmit({
+                name: routineFormik.values.name,
+                newRoutineExercises: newRoutineExercises
+            });
+        }
     });
 
     const routineExerciseFormik = useFormik({
         initialValues: {
             exercise: null,
-            day: '',
-            sets: '',
-            reps: ''
+            day: "",
+            sets: "",
+            reps: ""
         },
         validationSchema: yup.object({
             exercise: yup.object().required(),
@@ -166,20 +171,22 @@ export function RoutineForm({ exercises, onSubmit, routineExercises }: RoutineFo
                     size="medium"
                     variant="contained"
                     onClick={() => addExercise()}
-                    sx={{ width: "10%", height: "100%" }}>
+                    sx={{ width: "7%", height: "100%" }}>
                     Agregar
                 </Button>
             </Box>
 
-            <RoutineExercisesTable
-                routineExercises={newRoutineExercises}
-                removeRoutineExercise={removeRoutineExercise}
+            <Box sx={{mb: 4}}>
+                <RoutineExercisesTable
+                    routineExercises={newRoutineExercises}
+                    removeRoutineExercise={removeRoutineExercise}
                 />
+            </Box>
 
-            <Box sx={{display: "flex", justifyContent: "center"}}>
+            <Box sx={{display: "flex", justifyContent: "center", mb: 2}}>
                 <Button
                     type="submit"
-                    color="primary" variant="contained" sx={{ width: "20%" }}>
+                    color="primary" variant="contained" sx={{ width: "15%" }}>
                     Guardar
                 </Button>
             </Box>
