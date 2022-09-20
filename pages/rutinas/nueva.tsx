@@ -1,7 +1,7 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { RoutineForm, RoutineFormType } from "components/routines/RoutinesForm";
+import { RoutineForm } from "components/routines/routine-form/RoutinesForm";
 import { Exercise } from "models/exercise";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
@@ -9,18 +9,12 @@ import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
 
-
-
 const NewRoutine: any = ({exercises} : {exercises: Array<Exercise>}) => {
 	const router = useRouter()
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: RoutineFormType = {
-		name: "",
-		routineExercises: []
-	};
-
-	function onSubmit(values: RoutineFormType) {
+    function onSubmit(values: RoutineForm) {
+        console.log("Create Routine", values);
 		api.post("/api/routines", values)
 			.then(() => {
 				setOpenSnackbar(true);
@@ -36,8 +30,8 @@ const NewRoutine: any = ({exercises} : {exercises: Array<Exercise>}) => {
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
                 <RoutineForm
                     exercises={exercises}
-					initialValues={initialValues}
-					onSubmit={onSubmit}
+                    routineExercises={[]}
+                    onSubmit={onSubmit}
 				/>
 			</Box>
 			<Snackbar

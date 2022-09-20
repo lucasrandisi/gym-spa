@@ -1,7 +1,7 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { RoutineForm, RoutineFormType } from "components/routines/RoutinesForm";
+import { RoutineForm, RoutineFormType } from "components/routines/routine-form/RoutinesForm";
 import { Routine } from "models/routine";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
