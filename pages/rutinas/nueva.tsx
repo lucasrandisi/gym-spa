@@ -41,7 +41,6 @@ const NewRoutine: any = ({exercises} : {exercises: Array<Exercise>}) => {
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
                 <RoutineForm
                     exercises={exercises}
-                    routineExercises={[]}
                     onSubmit={onSubmit}
 				/>
 			</Box>

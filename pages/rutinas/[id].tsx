@@ -1,7 +1,8 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { RoutineForm, RoutineFormType } from "components/routines/routine-form/RoutinesForm";
+import { RoutineForm } from "components/routines/routine-form/RoutinesForm";
+import { Exercise } from "models/exercise";
 import { Routine } from "models/routine";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
@@ -9,27 +10,28 @@ import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
 type EditRoutineProps = {
-	routine: Routine;
+    routine: Routine;
+    exercises: Exercise[]
 }
 
-const EditRoutine: any = ({ routine }: EditRoutineProps) => {
+const EditRoutine: any = ({ routine, exercises }: EditRoutineProps) => {
 	const router = useRouter()
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: RoutineFormType = {
-		name: routine.name,
-		routineExercises: routine.routineExercises.map(routineExercise => {
-			return {
-				exerciseId: routineExercise.exercise.id,
-				day: routineExercise.day,
-				sets: routineExercise.sets,
-				reps: routineExercise.reps
-			}
-		})
-	};
+    function onSubmit(values: RoutineForm) {
+        const body = {
+            name: values.name,
+            exercises: values.newRoutineExercises.map(newExerciseRoutine => {
+                return {
+                    exerciseId: newExerciseRoutine.exercise.id,
+                    day: newExerciseRoutine.day,
+                    sets: newExerciseRoutine.sets,
+                    reps: newExerciseRoutine.reps
+                };
+            })
+        }
 
-	function onSubmit(values: RoutineFormType) {
-		api.put(`/api/routines/${routine.id}`, values)
+        api.put(`/api/routines/${routine.id}`, body)
 			.then(() => {
 				setOpenSnackbar(true);
 
@@ -42,7 +44,8 @@ const EditRoutine: any = ({ routine }: EditRoutineProps) => {
 			<Header title="Rutinas" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<RoutineForm
-					initialValues={initialValues}
+                    routine={routine}
+                    exercises={exercises}
 					onSubmit={onSubmit}
 				/>
 			</Box>
@@ -56,15 +59,23 @@ const EditRoutine: any = ({ routine }: EditRoutineProps) => {
 }
 
 export async function getServerSideProps({ req, params }: { req: NextApiRequest, params: { id: string } }) {
-	const routineResponse = await api.get(`/api/routines/${params.id}`, {
-		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
-	});
+    const [routineResponse, exercisesResponse] = await Promise.all([
+        api.get(`/api/routines/${params.id}`, {
+            headers: {
+                Authorization: "Bearer " + req.cookies.access_token
+            }
+        }),
+        api.get('/api/exercises', {
+            headers: {
+                Authorization: "Bearer " + req.cookies.access_token
+            }
+        })
+    ]);
 
 	return {
 		props: {
-			routine: routineResponse.data,
+            routine: routineResponse.data,
+            exercises: exercisesResponse.data,
 			isProtected: true,
 			userTypes: ["admin"],
 		}

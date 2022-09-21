@@ -4,7 +4,7 @@ import { Exercise } from "models/exercise";
 import React from "react";
 
 export type RoutineExercise = {
-    key: number,
+    key: string,
     exercise: Exercise,
     day: number,
     sets: number,

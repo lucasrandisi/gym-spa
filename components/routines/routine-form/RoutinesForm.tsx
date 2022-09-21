@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import { RoutineExercise, RoutineExercisesTable } from "../routine-exercises-table/RoutineExercisesTable";
 import styles from './routine-form.module.scss';
 import * as yup from 'yup';
+import { Routine } from "models/routine";
+import { v4 as uuidv4 } from 'uuid';
 
 const Form = styled('form')({});
 
@@ -16,31 +18,25 @@ export type RoutineForm = {
 type RoutineFormProps = {
     exercises: Array<Exercise>
     onSubmit: any;
-    routineExercises: {
-        id: number;
-        exercise: Exercise;
-        day: number;
-        sets: number;
-        reps: number;
-    }[],
+    routine?: Routine,
 }
 
 const dias = [1, 2, 3, 4, 5, 6, 7];
 
-export function RoutineForm({ exercises, onSubmit, routineExercises }: RoutineFormProps) {
-    const [newRoutineExercises, setNewRoutineExercises] = useState(routineExercises.map(routineExercise => {
+export function RoutineForm({ exercises, onSubmit, routine }: RoutineFormProps) {
+    const [newRoutineExercises, setNewRoutineExercises] = useState(routine ? routine.routineExercises.map(routineExercise => {
         return {
-            key: new Date().getTime(),
+            key: uuidv4(),
             exercise: routineExercise.exercise,
             day: routineExercise.day,
             sets: routineExercise.sets,
             reps: routineExercise.reps,
         }
-    }));
+    }): []);
 
     const routineFormik = useFormik({
         initialValues: {
-            name: "",
+            name: routine?.name ?? "",
         },
         validationSchema: yup.object({
             name: yup.string().required(),
@@ -80,7 +76,7 @@ export function RoutineForm({ exercises, onSubmit, routineExercises }: RoutineFo
         setNewRoutineExercises([
             ...newRoutineExercises,
             {
-                key: new Date().getTime(),
+                key: uuidv4(),
                 exercise: routineExerciseFormik.values.exercise!,
                 day: Number(routineExerciseFormik.values.day),
                 sets: Number(routineExerciseFormik.values.sets),
@@ -97,8 +93,8 @@ export function RoutineForm({ exercises, onSubmit, routineExercises }: RoutineFo
         }));
     }
     
-    function removeRoutineExercise(key: number) {
-        setNewRoutineExercises(newRoutineExercises.filter(newRoutineExercise => newRoutineExercise.key != key));
+    function removeRoutineExercise(key: string) {
+        setNewRoutineExercises(newRoutineExercises.filter(newRoutineExercise => newRoutineExercise.key !== key));
     }
     
     return (
