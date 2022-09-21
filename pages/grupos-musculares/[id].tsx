@@ -1,7 +1,7 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { MuscleGroupForm } from "components/muscle-groups/MuscleGroupForm";
+import { MuscleGroupForm, MuscleGroupFormType } from "components/muscle-groups/MuscleGroupForm";
 import { MuscleGroup } from "models/muscle-group";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
@@ -16,11 +16,11 @@ const EditMuscleGroup: any = ({ muscleGroup }: EditMuscleGroupProps) => {
 	const router = useRouter()
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: MuscleGroupForm = {
+	const initialValues: MuscleGroupFormType = {
 		name: muscleGroup.name,
 	};
 
-	function onSubmit(values: MuscleGroupForm) {
+	function onSubmit(values: MuscleGroupFormType) {
 		api.put(`/api/muscle-groups/${muscleGroup.id}`, values)
 			.then(() => {
 				setOpenSnackbar(true);

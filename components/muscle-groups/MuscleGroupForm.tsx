@@ -8,13 +8,13 @@ const Form = styled('form')({
 	width: "30%",
 });
 
-export type MuscleGroupForm = {
+export type MuscleGroupFormType = {
 	name: String;
 };
 
 type MuscleGroupFormProps = {
 	onSubmit: any;
-	initialValues: MuscleGroupForm
+	initialValues: MuscleGroupFormType
 }
 
 export function MuscleGroupForm({ onSubmit, initialValues }: MuscleGroupFormProps) {

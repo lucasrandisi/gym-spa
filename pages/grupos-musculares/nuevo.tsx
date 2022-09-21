@@ -1,7 +1,7 @@
 import { Box, Snackbar } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { MuscleGroupForm } from "components/muscle-groups/MuscleGroupForm";
+import { MuscleGroupForm, MuscleGroupFormType } from "components/muscle-groups/MuscleGroupForm";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
 import React, { ReactElement, useState } from "react";
@@ -12,11 +12,11 @@ const NewMuscleGroup: any = () => {
 	const router = useRouter()
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const initialValues: MuscleGroupForm = {
+	const initialValues: MuscleGroupFormType = {
 		name: "",
 	};
 
-	function onSubmit(values: MuscleGroupForm) {
+	function onSubmit(values: MuscleGroupFormType) {
 		api.post("/api/muscle-groups", values)
 			.then(() => {
 				setOpenSnackbar(true);
@@ -46,15 +46,8 @@ const NewMuscleGroup: any = () => {
 
 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-	const response = await api.get("/api/muscle-groups", {
-		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
-	});
-
 	return {
 		props: {
-			muscleGroups: response.data,
 			isProtected: true,
 			userTypes: ["admin"],
 		}
