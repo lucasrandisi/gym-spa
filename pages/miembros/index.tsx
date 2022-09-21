@@ -1,114 +1,148 @@
-import React, { ReactElement } from "react";
-
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
+import { NextApiRequest } from "next/types";
+import React, { ReactElement } from "react";
+import { api } from "services/api";
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import Link from 'next/link';
+import TextField from '@mui/material/TextField';
+import { Box } from '@mui/system';
+import { Button, Snackbar } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { User } from 'models/user';
+import moment from 'moment';
 
-import UserService, { User } from "services/user.service";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import Button from "@mui/material/Button";
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 
-import {
-	createColumnHelper,
-	useReactTable,
-	getFilteredRowModel,
-	getCoreRowModel,
-	getPaginationRowModel,
-	ColumnDef,
-} from "@tanstack/react-table";
 
-import DataTable from "components/table/Table";
-import DebouncedInput from "components/debounced";
-import fuzzyFilter from "components/table/fuzzyFilter";
+const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
+    const [searchValue, setSearchValue] = React.useState("");
+    const [users, setUsers] = React.useState(usersList);
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
+    const [snackbarText, setSnackbarText] = React.useState("")
 
-const columnHelper = createColumnHelper<User>();
+    const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const searchValue = event.target.value;
+        const filteredUsers = usersList.filter(user =>
+            user.name.toLocaleLowerCase().includes(searchValue)
+            || user.nroDoc.includes(searchValue)
+        )
 
-const columns: ColumnDef<User, any>[] = [
-	columnHelper.accessor("id", {
-		header: "ID",
-		cell: info => info.getValue(),
-	}),
-	columnHelper.accessor("nroDoc", {
-		header: "DNI",
-		cell: info => info.getValue(),
-	}),
-	columnHelper.accessor("name", {
-		header: "Nombre",
-		cell: info => info.getValue(),
-	}),
-	columnHelper.accessor("email", {
-		header: "Email",
-		cell: info => info.getValue(),
-	}),
-	{
-		id: "actions",
-		header: "Acciones",
-		cell: props => (
-			<div>
-				<Link href={`/miembros/${props.row.original.id}/rutina`} passHref>
-					<Button variant="contained">Rutina</Button>
-				</Link>
-				<Link href={`/miembros/${props.row.original.id}/editar`} passHref>
-					<IconButton aria-label="edit">
-						<EditIcon />
-					</IconButton>
-				</Link>
-			</div>
-		),
-	},
-];
+        setSearchValue(searchValue);
+        setUsers(filteredUsers);
+    };
 
-const UsersPage: any = () => {
-	const [globalFilter, setGlobalFilter] = React.useState("");
+    async function deleteUser(id: number) {
+        await api.delete(`/api/users/${id}`);
+        setSnackbarText("Miembro eliminado");
+        setOpenSnackbar(true);
 
-	const { isLoading, error, data } = useQuery(["users"], UserService.getAll, {
-		initialData: [],
-	});
+        api.get(`api/users`).then(({ data }) => setUsers(data));
+    }
 
-	const table = useReactTable({
-		data,
-		columns,
-		globalFilterFn: fuzzyFilter,
-		state: {
-			globalFilter,
-		},
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		enableColumnFilters: true,
-		enablePinning: true,
-	});
+    async function updatePayment(id: number) {
+        await api.post(`/api/users/${id}/update-payment`);
+        setSnackbarText("Fecha de pago actualizada");
+        setOpenSnackbar(true);
 
-	if (isLoading) return "Loading...";
+        api.get(`api/users`).then(({ data }) => setUsers(data));
+    }
 
-	if (error) return `An error has occurred: ${(error as Error).message}`;
+    return (
+        <>
+            <Header title="Usuarios" />
+            <Box sx={{ mb: 4, px: 2, display: "flex", alignItems: "flex-end" }}>
+                <TextField
+                    label="Nombre o Documento"
+                    variant="standard"
+                    type="search"
+                    value={searchValue}
+                    onChange={onSearchChange}
+                    color="secondary"
+                />
+                <Box sx={{ ml: "auto" }}>
+                    <Link href="miembros/nuevo">
+                        <Button variant="contained">Agregar</Button>
+                    </Link>
+                </Box>
+            </Box>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Id</TableCell>
+                            <TableCell>Nombre</TableCell>
+                            <TableCell>Documento</TableCell>
+                            <TableCell>Fecha de Pago</TableCell>
+                            <TableCell />
+                            <TableCell />
+                            <TableCell />
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {users.map((user) => (
+                            <TableRow key={user.id}>
+                                <TableCell>{user.id}</TableCell>
+                                <TableCell>{user.name}</TableCell>
+                                <TableCell>{user.nroDoc}</TableCell>
+                                <TableCell>{moment(user.payment).format("DD/MM/YYYY")}</TableCell>
+                                <TableCell>
+                                    <Link href={`/miembros/${user.id}`}>
+                                        <IconButton aria-label="edit">
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Link>
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton onClick={() => deleteUser(user.id)} aria-label="delete">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                                <TableCell>
+                                    <Button variant="contained" color="secondary" onClick={() => updatePayment(user.id)}>Registrar Pago</Button>
+                                </TableCell>
 
-	return (
-		<div>
-			<Header title="Miembros" />
-			<DebouncedInput
-				value={globalFilter}
-				onChange={value => setGlobalFilter(String(value))}
-				placeholder="Buscar..."
-			/>
-			<DataTable table={table} />
-		</div>
-	);
-};
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <Snackbar
+                open={openSnackbar}
+                message={snackbarText}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            />
+        </>
+    );
+
+}
+
+
+export async function getServerSideProps({ req }: { req: NextApiRequest }) {
+    const usersResponse = await api.get('/api/users', {
+        headers: {
+            Authorization: "Bearer " + req.cookies.access_token
+        }
+    });
+
+    return {
+        props: {
+            usersList: usersResponse.data,
+            isProtected: true,
+            userTypes: ["admin"],
+        }
+    };
+}
 
 export default UsersPage;
 
-export async function getStaticProps() {
-	return {
-		props: {
-			isProtected: true,
-			userTypes: ["admin"],
-		},
-	};
-}
-
 UsersPage.getLayout = function getLayout(page: ReactElement) {
-	return <AuthLayout>{page}</AuthLayout>;
+    return <AuthLayout>{page}</AuthLayout>;
 };
