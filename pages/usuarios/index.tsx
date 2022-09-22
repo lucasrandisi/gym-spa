@@ -68,7 +68,7 @@ const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
                     color="secondary"
                 />
                 <Box sx={{ ml: "auto" }}>
-                    <Link href="miembros/nuevo">
+                    <Link href="usuarios/nuevo">
                         <Button variant="contained">Agregar</Button>
                     </Link>
                 </Box>
@@ -83,7 +83,6 @@ const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
                             <TableCell>Fecha de Pago</TableCell>
                             <TableCell />
                             <TableCell />
-                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -93,13 +92,6 @@ const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell>{user.nroDoc}</TableCell>
                                 <TableCell>{moment(user.payment).format("DD/MM/YYYY")}</TableCell>
-                                <TableCell>
-                                    <Link href={`/miembros/${user.id}`}>
-                                        <IconButton aria-label="edit">
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Link>
-                                </TableCell>
                                 <TableCell>
                                     <IconButton onClick={() => deleteUser(user.id)} aria-label="delete">
                                         <DeleteIcon />

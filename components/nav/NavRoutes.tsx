@@ -26,8 +26,8 @@ export const routes = [
 	},
 	{
 		id: 1,
-		title: "Miembros",
-		path: "/miembros",
+		title: "Usuarios",
+		path: "/usuarios",
 		icon: <Badge />,
 	},
 	{
