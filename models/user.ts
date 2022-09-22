@@ -5,5 +5,6 @@ export type User = {
 	nroDoc: string;
 	name: string;
 	email: string,
-	roles: Array<Rol>
+    roles: Array<Rol>
+    payment: string;
 }
