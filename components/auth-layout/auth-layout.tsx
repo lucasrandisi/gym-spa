@@ -9,9 +9,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { Menu, MenuItem, Tooltip, Avatar, Badge, Divider } from "@mui/material";
-import { FitnessCenter, Logout, Notifications } from "@mui/icons-material";
-import { settings } from "components/nav/NavRoutes";
+import { Menu, MenuItem, Tooltip, Avatar } from "@mui/material";
+import { FitnessCenter, Logout } from "@mui/icons-material";
 import { useAuth } from "security/auth.context";
 import SideNavMenu from "components/nav/SideMenu";
 
@@ -74,16 +73,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 					<Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }} />
 
 					<Box sx={{ flexGrow: 0 }}>
-						<IconButton
-							size="large"
-							aria-label="notifications"
-							color="inherit"
-							sx={{ mr: 1.5 }}>
-							<Badge badgeContent={0} color="error">
-								<Notifications />
-							</Badge>
-						</IconButton>
-
 						<Tooltip title="Open settings">
 							<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
 								<Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -104,15 +93,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 							}}
 							open={Boolean(anchorElUser)}
 							onClose={handleCloseUserMenu}>
-							{settings.map(setting => (
-								<Link key={setting.id} href={setting.path} passHref>
-									<MenuItem onClick={handleCloseUserMenu}>
-										<ListItemIcon sx={{ mr: 0.5 }}>{setting.icon}</ListItemIcon>
-										<Typography textAlign="center">{setting.title}</Typography>
-									</MenuItem>
-								</Link>
-							))}
-							<Divider />
 							<MenuItem onClick={auth.logout}>
 								<ListItemIcon sx={{ mr: 0.5 }}>
 									<Logout />
