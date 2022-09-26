@@ -7,7 +7,6 @@ import {
 	FitnessCenter,
 	Home,
 	PersonAdd,
-	Settings,
 } from "@mui/icons-material";
 
 export type RouteType = {
@@ -44,15 +43,9 @@ export const routes = [
 	},
 	{
 		id: 4,
-		title: "Grupos Musculares",
+		title: "Musculos",
 		path: "/grupos-musculares",
 		icon: <Accessibility />,
-	},
-	{
-		id: 5,
-		title: "Settings",
-		path: "/settings",
-		icon: <Settings />,
 	},
 ];
 
@@ -70,8 +63,8 @@ export const settings = [
 export const admin = [
 	{
 		id: 0,
-		title: "Roles",
-		path: "/protected",
+		title: "Agregar",
+		path: "/usuarios/nuevo",
 		icon: <PersonAdd />,
 	},
 ];
