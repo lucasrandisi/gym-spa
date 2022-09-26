@@ -29,6 +29,7 @@ function LoginForm() {
 			auth.login(email, password)
 	);
 
+
 	return (
 		<Formik
 			initialValues={initialValues}
@@ -88,7 +89,7 @@ function LoginForm() {
 					</Button>
 
 					{mutation.isError && (
-						<span className={styles.error}>{(mutation.error as Error).message}</span>
+						<span className={styles.error}>Credenciales Inválidas</span>
 					)}
 				</Form>
 			)}
