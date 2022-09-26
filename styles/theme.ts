@@ -11,10 +11,10 @@ export default createTheme({
 		},
 		secondary: {
 			// light: will be calculated from palette.secondary.main,
-            main: "#ffee58",
+            main: "#d7d701",
 			// dark: will be calculated from palette.secondary.main,
 			// contrastText: will be calculated to contrast with palette.secondary.main
-		},
+        },
 		// Used by `getContrastText()` to maximize the contrast between
 		// the background and the text.
 		contrastThreshold: 3,
