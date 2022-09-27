@@ -46,7 +46,8 @@ class AuthService {
 
 	static logout = (): void => {
 		Cookies.remove("access_token");
-		Cookies.remove("refresh_token");
+        Cookies.remove("refresh_token");
+        Cookies.remove("user");
 	};
 
 	static getToken = () => Cookies.get("access_token");

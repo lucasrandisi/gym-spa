@@ -10,7 +10,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { admin, routes, RouteType } from "components/nav/NavRoutes";
+import { adminRoutes, userRoutes, RouteType } from "components/nav/NavRoutes";
 import { useRouter } from "next/router";
 import { Divider } from "@mui/material";
 import { useAuth } from "security/auth.context";
@@ -98,7 +98,7 @@ const RouteGroup = ({ items, open }: { items: RouteType[]; open: boolean }) => {
 const SideNavMenu = ({ open }: { open: boolean }) => {
 	const { user } = useAuth();
 
-	return (
+    return (
 		<Drawer variant="permanent" open={open}>
 			<DrawerHeader />
 
@@ -107,14 +107,20 @@ const SideNavMenu = ({ open }: { open: boolean }) => {
 					flexGrow: 2,
 					display: { md: "flex", flexDirection: "column" },
 				}}>
-				<RouteGroup items={routes} open={open} />
 
-				{user?.roles.indexOf("admin") !== -1 && (
+                {user?.roles.indexOf("admin") !== -1 && (
 					<div>
 						<Divider />
-						<RouteGroup items={admin} open={open} />
+                        <RouteGroup items={adminRoutes} open={open} />
 					</div>
-				)}
+                )}
+                
+                {user?.roles.indexOf("user") !== -1 && (
+                    <div>
+                        <Divider />
+                        <RouteGroup items={userRoutes} open={open} />
+                    </div>
+                )}
 			</Box>
 		</Drawer>
 	);

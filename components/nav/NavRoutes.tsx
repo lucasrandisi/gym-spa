@@ -16,41 +16,6 @@ export type RouteType = {
 	icon: any;
 };
 
-export const routes = [
-	{
-		id: 0,
-		title: "Home",
-		path: "/",
-		icon: <Home />,
-	},
-	{
-		id: 1,
-		title: "Usuarios",
-		path: "/usuarios",
-		icon: <Badge />,
-	},
-	{
-		id: 2,
-		title: "Rutinas",
-		path: "/rutinas",
-		icon: <Assignment />,
-	},
-	{
-		id: 3,
-		title: "Ejercicios",
-		path: "/ejercicios",
-		icon: <FitnessCenter />,
-	},
-	{
-		id: 4,
-		title: "Musculos",
-		path: "/grupos-musculares",
-		icon: <Accessibility />,
-	},
-];
-
-export default routes;
-
 export const settings = [
 	{
 		id: 0,
@@ -60,11 +25,50 @@ export const settings = [
 	},
 ];
 
-export const admin = [
+export const adminRoutes = [
+    {
+        id: 0,
+        title: "Home",
+        path: "/",
+        icon: <Home />,
+    },
 	{
-		id: 0,
+		id: 1,
 		title: "Agregar",
 		path: "/usuarios/nuevo",
 		icon: <PersonAdd />,
-	},
+    },
+    {
+        id: 2,
+        title: "Usuarios",
+        path: "/usuarios",
+        icon: <Badge />,
+    },
+    {
+        id: 3,
+        title: "Rutinas",
+        path: "/rutinas",
+        icon: <Assignment />,
+    },
+    {
+        id: 4,
+        title: "Ejercicios",
+        path: "/ejercicios",
+        icon: <FitnessCenter />,
+    },
+    {
+        id: 5,
+        title: "Musculos",
+        path: "/grupos-musculares",
+        icon: <Accessibility />,
+    },
 ];
+
+export const userRoutes = [
+    {
+        id: 0,
+        title: "Mi Rutina",
+        path: "/mi-rutina",
+        icon: <Assignment />,
+    },
+]

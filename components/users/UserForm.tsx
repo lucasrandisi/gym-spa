@@ -1,8 +1,8 @@
 import { Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, styled, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import { Rol } from "models/rol";
+import { Routine } from "models/routine";
 import React from "react";
-import * as yup from 'yup';
 
 
 
@@ -13,18 +13,21 @@ const Form = styled('form')({
 export type UserForm = {
     name: string;
     email: string;
-    password: string;
+    password?: string;
     nroDoc: string;
     rolId: number;
+    routineId: string | number;
 };
 
 type UserFormProps = {
 	onSubmit: any;
     initialValues: UserForm;
-    roles: Rol[]
+    roles: Rol[],
+    routines: Routine[],
+    passwordInput: boolean
 }
 
-export function UserForm({ onSubmit, initialValues, roles }: UserFormProps) {
+export function UserForm({ onSubmit, initialValues, roles, routines, passwordInput }: UserFormProps) {
 	const formik = useFormik({
 		initialValues: initialValues,
         onSubmit: onSubmit,
@@ -50,7 +53,7 @@ export function UserForm({ onSubmit, initialValues, roles }: UserFormProps) {
                 error={formik.touched.email && Boolean(formik.errors.email)}
                 sx={{ width: "100%", mb: 2 }}
             />
-            <TextField
+            { passwordInput && <TextField
                 id="password"
                 name="password"
                 label="Password"
@@ -59,7 +62,7 @@ export function UserForm({ onSubmit, initialValues, roles }: UserFormProps) {
                 onChange={formik.handleChange}
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 sx={{ width: "100%", mb: 2 }}
-            />
+            /> }
             <TextField
                 id="nroDoc"
                 name="nroDoc"
@@ -69,7 +72,7 @@ export function UserForm({ onSubmit, initialValues, roles }: UserFormProps) {
                 error={formik.touched.nroDoc && Boolean(formik.errors.nroDoc)}
                 sx={{ width: "100%", mb: 2 }}
             />
-            <FormControl sx={{ width: "100%", mb: 6 }}>
+            <FormControl sx={{ width: "100%", mb: 2 }}>
                 <InputLabel>Rol</InputLabel>
                 <Select
                     id="rolId"
@@ -85,7 +88,24 @@ export function UserForm({ onSubmit, initialValues, roles }: UserFormProps) {
                     ))}
                 </Select>
             </FormControl>
-            
+            <FormControl sx={{ width: "100%", mb: 6 }}>
+                <InputLabel>Rutina</InputLabel>
+                <Select
+                    id="routineId"
+                    name="routineId"
+                    value={formik.values.routineId}
+                    onChange={formik.handleChange}
+                    error={Boolean(formik.errors.routineId)}
+                    input={<OutlinedInput label="Rutina" />}>
+                    {routines.map((routine) => (
+                        <MenuItem key={routine.id} value={routine.id}>
+                            {routine.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
+
 			<Button color="primary" variant="contained" type="submit" fullWidth>
 				Guardar
 			</Button>
