@@ -108,14 +108,14 @@ const SideNavMenu = ({ open }: { open: boolean }) => {
 					display: { md: "flex", flexDirection: "column" },
 				}}>
 
-                {user?.roles.indexOf("admin") !== -1 && (
+                {user?.roles.some(r => r.name === "Admin") && (
 					<div>
 						<Divider />
                         <RouteGroup items={adminRoutes} open={open} />
 					</div>
                 )}
                 
-                {user?.roles.indexOf("user") !== -1 && (
+                {user?.roles.some(r => r.name === "User" ) && (
                     <div>
                         <Divider />
                         <RouteGroup items={userRoutes} open={open} />

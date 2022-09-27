@@ -114,7 +114,7 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
         props: {
             exercisesList: exercisesResponse.data,
             isProtected: true,
-            userTypes: ["admin"],
+            userTypes: ["Admin"],
         }
     };
 }

@@ -77,7 +77,7 @@ export async function getServerSideProps({ req, params }: { req: NextApiRequest,
             routine: routineResponse.data,
             exercises: exercisesResponse.data,
 			isProtected: true,
-			userTypes: ["admin"],
+			userTypes: ["Admin"],
 		}
 	};
 }

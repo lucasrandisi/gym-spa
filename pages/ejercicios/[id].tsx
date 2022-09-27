@@ -77,7 +77,7 @@ export async function getStaticProps() {
 	return {
 		props: {
 			isProtected: true,
-			userTypes: ["admin"],
+			userTypes: ["Admin"],
 		},
 	};
 }

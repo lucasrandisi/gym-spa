@@ -25,7 +25,7 @@ const Auth = ({ children }: { children: any }) => {
 		userTypes &&
 		isAuthenticated &&
 		user?.roles &&
-		!user.roles.some((r: string) => userTypes.includes(r))
+		!user.roles.some(r => userTypes.includes(r.name))
 	) {
 		return <p>Sorry, you dont have access</p>;
 	}
