@@ -7,7 +7,6 @@ import { Box } from "@mui/material";
 import Header from "components/header/header";
 import moment from 'moment';
 import { User } from "models/user";
-import theme from "styles/theme";
 
 enum UserStatus {
     AllowAccess,

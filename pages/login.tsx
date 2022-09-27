@@ -11,10 +11,14 @@ import { useAuth } from "security/auth.context";
 
 function LoginPage() {
 	const router = useRouter();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, user } = useAuth();
 
-	if (isAuthenticated) {
-		router.push("/");
+    if (isAuthenticated && user) {
+        if (user.roles.includes("admin")) {
+            router.push("/");
+        } else {
+            router.push("/mi-rutina");
+        }
 	}
 
 	return (
