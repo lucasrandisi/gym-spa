@@ -1,12 +1,6 @@
+import { User } from "models/user";
 import { api } from "./api";
 
-export type User = {
-	id: number;
-	nroDoc: string;
-	name: string;
-	email: string;
-	roles: string[];
-};
 
 class UserService {
 	static me = async (): Promise<User> => {

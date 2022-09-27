@@ -49,7 +49,7 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 	return {
 		props: {
 			isProtected: true,
-			userTypes: ["admin"],
+			userTypes: ["Admin"],
 		}
 	};
 }

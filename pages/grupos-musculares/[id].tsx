@@ -59,7 +59,7 @@ export async function getServerSideProps({ req, params }: { req: NextApiRequest,
 		props: {
 			muscleGroup: muscleGroupResponse.data,
 			isProtected: true,
-			userTypes: ["admin"],
+			userTypes: ["Admin"],
 		}
 	};
 }

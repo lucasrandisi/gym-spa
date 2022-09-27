@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
 import Cookies from "js-cookie";
+import { User } from "models/user";
 import { useRouter } from "next/router";
 import React, {
 	createContext,
@@ -11,7 +12,7 @@ import React, {
 	useState,
 } from "react";
 import AuthService from "services/auth.service";
-import UserService, { User } from "services/user.service";
+import UserService from "services/user.service";
 
 export interface UserContext {
 	user: User | null;
@@ -39,33 +40,26 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		}
 	};
 
-	const loadUser = useCallback(async () => {
-		const u = Cookies.get("user");
-		if (u) {
-			setUser(JSON.parse(u));
-			setIsAuthenticated(true);
-			return;
-		}
+    const loadUser = useCallback(async () => {
 
-		let token = AuthService.getToken();
+        let token = AuthService.getToken();
 
-		if (!token) {
-			await refresh();
-		}
+        if (!token) {
+            await refresh();
+        }
 
-		token = AuthService.getToken();
-		if (token) {
-			setToken(token);
-			setIsAuthenticated(true);
+        token = AuthService.getToken();
+        if (token) {
+            setToken(token);
+            setIsAuthenticated(true);
 
-			const user = await UserService.me();
-			if (user) {
-				setUser(user);
-				Cookies.set("user", JSON.stringify(user));
-			}
-		}
-	}, []);
-
+            const user = await UserService.me();
+            if (user) {
+                setUser(user);
+            }
+        }
+    }, []);
+    
 	const login = useCallback(
 		async (username: string, password: string) => {
 			setLoading(true);

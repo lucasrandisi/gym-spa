@@ -14,8 +14,8 @@ function LoginPage() {
 	const { isAuthenticated, user } = useAuth();
 
     if (isAuthenticated && user) {
-        if (user.roles.includes("admin")) {
-            router.push("/");
+        if (user.roles.some(r => r.name === "Admin")) {
+            router.push("/usuarios");
         } else {
             router.push("/mi-rutina");
         }
