@@ -7,7 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { Menu, MenuItem, Tooltip, Avatar } from "@mui/material";
 import { FitnessCenter, Logout } from "@mui/icons-material";
@@ -75,7 +75,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 					<Box sx={{ flexGrow: 0 }}>
 						<Tooltip title="Open settings">
 							<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-								<Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                <AccountCircleIcon sx={{ color: "white", fontSize: 40}}/>
 							</IconButton>
 						</Tooltip>
 						<Menu
