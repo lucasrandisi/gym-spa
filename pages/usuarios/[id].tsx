@@ -19,7 +19,7 @@ const EditUser: any = ({ roles, user, routines }: { roles: Rol[], user: User, ro
         name: user.name,
         email: user.email,
         nroDoc: user.nroDoc,
-        rolId: 2,
+        rolId: user.roles[0].id,
         routineId: user.routine ? user.routine.id : "",
     };
 
