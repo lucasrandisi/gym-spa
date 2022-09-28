@@ -12,7 +12,8 @@ import { api } from "services/api";
 
 const NewUser: any = ({ roles, routines }: { roles: Rol[], routines: Routine[] } ) => {
 	const router = useRouter()
-	const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
 
     const initialValues: UserForm = {
         name: "",
@@ -29,7 +30,9 @@ const NewUser: any = ({ roles, routines }: { roles: Rol[], routines: Routine[] }
 				setOpenSnackbar(true);
 
 				setTimeout(() => router.push("/usuarios"), 2000);
-			});
+            }).catch((errorResponse) => {
+                setSubmitError(errorResponse.message)
+            });
 	}
 
 	return (
@@ -42,6 +45,7 @@ const NewUser: any = ({ roles, routines }: { roles: Rol[], routines: Routine[] }
                     roles={roles}
                     routines={routines}
                     passwordInput={true}
+                    submitError={submitError}
 				/>
 			</Box>
 			<Snackbar
