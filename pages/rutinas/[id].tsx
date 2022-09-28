@@ -42,7 +42,7 @@ const EditRoutine: any = ({ routine, exercises }: EditRoutineProps) => {
 	return (
 		<>
 			<Header title="Rutinas" />
-			<Box sx={{ display: "flex", justifyContent: "center" }}>
+			<Box sx={{ display: "flex", justifyContent: "center", ml: "1rem" }}>
 				<RoutineForm
                     routine={routine}
                     exercises={exercises}

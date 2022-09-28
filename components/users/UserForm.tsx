@@ -1,9 +1,9 @@
-import { Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, styled, TextField } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, styled, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import { Rol } from "models/rol";
 import { Routine } from "models/routine";
 import React from "react";
-
+import * as yup from 'yup';
 
 
 const Form = styled('form')({
@@ -22,15 +22,23 @@ export type UserForm = {
 type UserFormProps = {
 	onSubmit: any;
     initialValues: UserForm;
-    roles: Rol[],
-    routines: Routine[],
-    passwordInput: boolean
+    roles: Rol[];
+    routines: Routine[];
+    passwordInput: boolean;
+    submitError: null | string;
 }
 
-export function UserForm({ onSubmit, initialValues, roles, routines, passwordInput }: UserFormProps) {
+export function UserForm({ onSubmit, initialValues, roles, routines, passwordInput, submitError }: UserFormProps) {
 	const formik = useFormik({
 		initialValues: initialValues,
         onSubmit: onSubmit,
+        validationSchema: yup.object().shape({
+            name: yup.string().required("Campo requerido"),
+            email: yup.string().email("Debe ser un email válido").required("Campo requerido"),
+            ...(passwordInput && { password: yup.string().required("Campo requerido") }),
+            nroDoc: yup.string().required("Campo requerido"),
+            rolId: yup.number().required("Campo requerido"),
+        })
     });
     
 	return (
@@ -41,7 +49,8 @@ export function UserForm({ onSubmit, initialValues, roles, routines, passwordInp
 				label="Nombre"
 				value={formik.values.name}
 				onChange={formik.handleChange}
-				error={formik.touched.name && Boolean(formik.errors.name)}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
 				sx={{ width: "100%", mb: 2 }}
             />
             <TextField
@@ -51,6 +60,7 @@ export function UserForm({ onSubmit, initialValues, roles, routines, passwordInp
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
                 sx={{ width: "100%", mb: 2 }}
             />
             { passwordInput && <TextField
@@ -61,6 +71,7 @@ export function UserForm({ onSubmit, initialValues, roles, routines, passwordInp
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 error={formik.touched.password && Boolean(formik.errors.password)}
+                helperText={formik.touched.password && formik.errors.password}
                 sx={{ width: "100%", mb: 2 }}
             /> }
             <TextField
@@ -70,6 +81,7 @@ export function UserForm({ onSubmit, initialValues, roles, routines, passwordInp
                 value={formik.values.nroDoc}
                 onChange={formik.handleChange}
                 error={formik.touched.nroDoc && Boolean(formik.errors.nroDoc)}
+                helperText={formik.touched.nroDoc && formik.errors.nroDoc}
                 sx={{ width: "100%", mb: 2 }}
             />
             <FormControl sx={{ width: "100%", mb: 2 }}>
@@ -108,7 +120,9 @@ export function UserForm({ onSubmit, initialValues, roles, routines, passwordInp
 
 			<Button color="primary" variant="contained" type="submit" fullWidth>
 				Guardar
-			</Button>
+            </Button>
+            
+            {submitError && <Box sx={{mt: 4, textAlign: "center", color: "red"}}>{submitError}</Box>}
 		</Form>
 	);
 }

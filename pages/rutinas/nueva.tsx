@@ -38,7 +38,7 @@ const NewRoutine: any = ({exercises} : {exercises: Array<Exercise>}) => {
 	return (
 		<>
 			<Header title="Rutinas" />
-			<Box sx={{ display: "flex", justifyContent: "center" }}>
+			<Box sx={{ display: "flex", justifyContent: "center", ml: "1rem" }}>
                 <RoutineForm
                     exercises={exercises}
                     onSubmit={onSubmit}
