@@ -44,7 +44,7 @@ function LoginForm() {
 						as={TextField}
 						fullWidth
 						value={values.email}
-						error={touched.email && errors.email}
+						error={touched.email && Boolean(errors.email)}
 						helperText={touched.email && errors.email}
 						margin="dense"
 						InputProps={{
@@ -64,7 +64,7 @@ function LoginForm() {
 						as={TextField}
 						fullWidth
 						value={values.password}
-						error={touched.password && errors.password}
+                        error={touched.password && Boolean(errors.password)}
 						helperText={touched.password && errors.password}
 						margin="dense"
 						InputProps={{
