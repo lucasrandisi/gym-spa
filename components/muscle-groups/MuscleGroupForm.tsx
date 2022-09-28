@@ -1,7 +1,8 @@
 import { Button, styled, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import React from "react";
-
+import * as yup from "yup"; 
+    
 
 
 const Form = styled('form')({
@@ -20,7 +21,10 @@ type MuscleGroupFormProps = {
 export function MuscleGroupForm({ onSubmit, initialValues }: MuscleGroupFormProps) {
 	const formik = useFormik({
 		initialValues: initialValues,
-		onSubmit: onSubmit
+        onSubmit: onSubmit,
+        validationSchema: yup.object({
+            name: yup.string().required()
+        })
 	});
 	return (
 		<Form onSubmit={formik.handleSubmit} >
@@ -31,8 +35,7 @@ export function MuscleGroupForm({ onSubmit, initialValues }: MuscleGroupFormProp
 				value={formik.values.name}
 				onChange={formik.handleChange}
 				error={formik.touched.name && Boolean(formik.errors.name)}
-				helperText={formik.touched.name && formik.errors.name}
-				sx={{ width: "100%", mb: 2 }}
+				sx={{ width: "100%", mb: 4 }}
 			/>
 			<Button color="primary" variant="contained" type="submit" fullWidth>
 				Guardar
