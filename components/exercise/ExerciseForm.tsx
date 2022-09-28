@@ -8,9 +8,12 @@ import {
 	styled,
 	TextField,
 } from "@mui/material";
-import { useFormik } from "formik";
+import { useFormik, yupToFormErrors } from "formik";
 import { MuscleGroup } from "models/muscle-group";
 import React from "react";
+import * as yup from 'yup';
+
+
 
 const Form = styled("form")({
 	width: "30%",
@@ -27,16 +30,16 @@ type ExerciseFormProps = {
 	initialValues: ExerciseFormType;
 };
 
-export function ExerciseForm({
-	muscleGroups,
-	onSubmit,
-	initialValues,
-}: ExerciseFormProps) {
-	const formik = useFormik({
+export function ExerciseForm({ muscleGroups, onSubmit, initialValues, }: ExerciseFormProps) {
+    const formik = useFormik({
 		initialValues,
-		onSubmit,
-	});
-	return (
+        onSubmit,
+        validationSchema: yup.object({
+            name: yup.string().required(),
+        })
+    });
+
+    return (
 		<Form onSubmit={formik.handleSubmit}>
 			<TextField
 				id="name"
@@ -45,7 +48,6 @@ export function ExerciseForm({
 				value={formik.values.name}
 				onChange={formik.handleChange}
 				error={formik.touched.name && Boolean(formik.errors.name)}
-				helperText={formik.touched.name && formik.errors.name}
 				sx={{ width: "100%", mb: 2 }}
 			/>
 			<FormControl sx={{ width: "100%", mb: 4 }}>

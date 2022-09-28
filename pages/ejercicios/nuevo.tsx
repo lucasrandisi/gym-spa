@@ -3,48 +3,41 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AuthLayout from "components/auth-layout/auth-layout";
 import { ExerciseForm, ExerciseFormType } from "components/exercise/ExerciseForm";
 import Header from "components/header/header";
+import { MuscleGroup } from "models/muscle-group";
+import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
 import React, { ReactElement, useState } from "react";
+import { api } from "services/api";
 import ExerciseService from "services/exercise.service";
 
-const NewExercise: any = () => {
-	const router = useRouter();
-	const queryClient = useQueryClient();
-	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const muscleGroups = useQuery(["muscles-groups"], ExerciseService.getAllMuscles, {
-		initialData: [],
-		// cacheTime: 2000,
-	});
+
+const NewExercise: any = ({muscleGroups}: {muscleGroups: MuscleGroup[]}) => {
+	const router = useRouter();
+	const [openSnackbar, setOpenSnackbar] = useState(false);
 
 	const initialValues: ExerciseFormType = {
 		name: "",
 		muscleGroupIds: [],
 	};
 
-	const mutation = useMutation(
-		["create-exercise"],
-		(values: ExerciseFormType) => ExerciseService.create(values),
-		{
-			onError: () => {
-				setOpenSnackbar(true);
-			},
-			onSuccess: async data => {
-				queryClient.setQueryData(["excercises"], (old: any) => [...old, data]);
-				setOpenSnackbar(true);
-			},
-			onSettled: () => router.push("/ejercicios"),
-		}
-	);
+    function onSubmit(values: ExerciseFormType) {
+        api.post("/api/exercises", values)
+            .then(() => {
+                setOpenSnackbar(true);
+
+                setTimeout(() => router.push("/ejercicios"), 2000);
+            });
+    }
 
 	return (
 		<div>
 			<Header title="Ejercicios" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<ExerciseForm
-					muscleGroups={muscleGroups.data}
+					muscleGroups={muscleGroups}
 					initialValues={initialValues}
-					onSubmit={mutation.mutate}
+					onSubmit={onSubmit}
 				/>
 			</Box>
 			<Snackbar
@@ -58,13 +51,20 @@ const NewExercise: any = () => {
 
 export default NewExercise;
 
-export async function getStaticProps() {
-	return {
-		props: {
-			isProtected: true,
-			userTypes: ["Admin"],
-		},
-	};
+export async function getServerSideProps({ req }: { req: NextApiRequest }) {
+    const muscleGroupsResponse = await api.get('/api/muscle-groups', {
+        headers: {
+            Authorization: "Bearer " + req.cookies.access_token
+        }
+    });
+
+    return {
+        props: {
+            muscleGroups: muscleGroupsResponse.data,
+            isProtected: true,
+            userTypes: ["Admin"],
+        }
+    };
 }
 
 NewExercise.getLayout = function getLayout(page: ReactElement) {
