@@ -93,6 +93,9 @@ const UsersPage: any = () => {
 				onChange={value => setGlobalFilter(String(value))}
 				placeholder="Buscar..."
 			/>
+			<Link href="/miembros/nuevo" passHref>
+				<Button variant="contained">Agregar</Button>
+			</Link>
 			<DataTable table={table} />
 		</div>
 	);
