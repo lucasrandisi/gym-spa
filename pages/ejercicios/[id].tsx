@@ -44,7 +44,7 @@ const EditExercise: any = () => {
 	};
 
 	return (
-		<AuthLayout>
+		<div>
 			<Header title="Ejercicios" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				{exercise.data && (
@@ -60,7 +60,7 @@ const EditExercise: any = () => {
 				message="Ejercicio actualizado"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
-		</AuthLayout>
+		</div>
 	);
 };
 

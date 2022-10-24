@@ -1,11 +1,16 @@
 import { api } from "./api";
 
+export type Role = {
+	id: Number;
+	name: String;
+};
+
 export type User = {
 	id: number;
 	nroDoc: string;
 	name: string;
 	email: string;
-	roles: string[];
+	roles: Role[];
 };
 
 class UserService {

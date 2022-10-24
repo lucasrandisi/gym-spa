@@ -1,6 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import FullPageLoader from "components/FullPageLoader";
+import { Role } from "services/user.service";
 import { useAuth } from "./auth.context";
 
 const Auth = ({ children }: { children: any }) => {
@@ -25,7 +26,7 @@ const Auth = ({ children }: { children: any }) => {
 		userTypes &&
 		isAuthenticated &&
 		user?.roles &&
-		!user.roles.some((r: string) => userTypes.includes(r))
+		!user.roles.some((r: Role) => userTypes.includes(r.name.toLowerCase()))
 	) {
 		return <p>Sorry, you dont have access</p>;
 	}
