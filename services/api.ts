@@ -2,15 +2,10 @@ import Axios from "axios";
 // eslint-disable-next-line import/no-cycle
 import authService from "./auth.service";
 
-const URL = {
-	production: process.env.NEXT_PUBLIC_BACKEND_URL,
-	development: "http://localhost:8080/",
-	test: "http://localhost:8080/",
-};
 
 // eslint-disable-next-line import/prefer-default-export
 export const api = Axios.create({
-	baseURL: URL[process.env.NODE_ENV],
+	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
 	headers: {
 		Accept: "application/json",
 	},
