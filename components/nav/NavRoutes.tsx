@@ -6,6 +6,7 @@ import {
 	Badge,
 	FitnessCenter,
 	Home,
+	Payment,
 	PersonAdd,
 } from "@mui/icons-material";
 
@@ -62,12 +63,6 @@ export const adminRoutes = [
         path: "/grupos-musculares",
         icon: <Accessibility />,
     },
-    {
-        id: 6,
-        title: "Mi Rutina",
-        path: "/mi-rutina",
-        icon: <Assignment />,
-    },
 ];
 
 export const userRoutes = [
@@ -76,5 +71,11 @@ export const userRoutes = [
         title: "Mi Rutina",
         path: "/mi-rutina",
         icon: <Assignment />,
+    },
+    {
+        id: 0,
+        title: "Pagos",
+        path: "/payments",
+        icon: <Payment />,
     },
 ]

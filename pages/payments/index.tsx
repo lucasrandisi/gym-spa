@@ -1,0 +1,72 @@
+import React, { ReactElement } from "react";
+import { useQuery } from "@tanstack/react-query";
+import AuthLayout from "components/auth-layout/auth-layout";
+import { useAuth } from "security/auth.context";
+import PaymentService from "services/payment.service";
+import {
+	TableContainer,
+	Paper,
+	Table,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
+} from "@mui/material";
+import moment from "moment";
+import Header from "components/header/header";
+
+const PaymentsPage: any = () => {
+	const { user } = useAuth();
+
+	const { isLoading, error, data } = useQuery(
+		["my-payments"],
+		() => PaymentService.findAllByUser(user!.id),
+		{
+			initialData: [],
+		}
+	);
+
+	if (isLoading) return "Loading...";
+
+	if (error) return `An error has occurred: ${(error as Error).message}`;
+
+	return (
+		<div>
+			<Header title="Mis pagos" />
+			<TableContainer component={Paper}>
+				<Table>
+					<TableHead>
+						<TableRow>
+							<TableCell>Fecha de Pago</TableCell>
+							<TableCell>Vigencia</TableCell>
+							<TableCell>Monto $</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{data!.map(p => (
+							<TableRow key={p.id}>
+								<TableCell>{moment(p.paymentDate).format("DD/MM/YYYY")}</TableCell>
+								<TableCell>{moment(p.expirationDate).format("DD/MM/YYYY")}</TableCell>
+								<TableCell>${p.amount}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
+		</div>
+	);
+};
+
+export default PaymentsPage;
+
+export async function getStaticProps() {
+	return {
+		props: {
+			isProtected: true,
+		},
+	};
+}
+
+PaymentsPage.getLayout = function getLayout(page: ReactElement) {
+	return <AuthLayout>{page}</AuthLayout>;
+};
