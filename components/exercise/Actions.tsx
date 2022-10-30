@@ -1,25 +1,27 @@
-import { IconButton } from "@mui/material";
+import React from "react";
+import { IconButton, Snackbar } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Row } from "@tanstack/react-table";
 import { Exercise } from "models/exercise";
 import Link from "next/link";
 import ExerciseService from "services/exercise.service";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const ExerciseTableActions = ({ row }: { row: Row<Exercise> }) => {
+const ExerciseTableActions = ({ exercise }: { exercise: Exercise }) => {
+	const [openDeleteSnackbar, setOpenDeleteSnackbar] = React.useState(false);
 	const queryClient = useQueryClient();
-	const { original: exercise } = row;
 
 	const mutation = useMutation(
 		["delete-exercise"],
-		(id: string) => ExerciseService.delete(id),
+		() => ExerciseService.delete(exercise.id),
 		{
 			onError: err => {
+				// TODO: push error notification to snackbar 
 				console.error(err);
 			},
 			onSuccess: () => {
 				queryClient.fetchQuery(["excercises"]);
+				setOpenDeleteSnackbar(true);
 			},
 		}
 	);
@@ -32,11 +34,15 @@ const ExerciseTableActions = ({ row }: { row: Row<Exercise> }) => {
 				</IconButton>
 			</Link>
 
-			<IconButton
-				onClick={() => mutation.mutate(exercise.id.toString())}
-				aria-label="delete">
+			<IconButton onClick={() => mutation.mutate()} aria-label="delete">
 				<DeleteIcon />
 			</IconButton>
+
+			<Snackbar
+				open={openDeleteSnackbar}
+				message="Ejercicio eliminado"
+				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+			/>
 		</div>
 	);
 };
