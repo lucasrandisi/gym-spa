@@ -20,7 +20,7 @@ import Header from "components/header/header";
 const PaymentsPage: any = () => {
 	const { user } = useAuth();
 
-	const { isLoading, error, data } = useQuery(
+	const { isLoading, error, data, isFetched } = useQuery(
 		["my-payments"],
 		() => PaymentService.findAllByUser(user!.id),
 		{
@@ -36,7 +36,7 @@ const PaymentsPage: any = () => {
 		<div>
 			<Header title="Mis pagos" />
 
-			{data && data.length > 0 && (
+			{data.length > 0 && (
 				<TableContainer component={Paper}>
 					<Table>
 						<TableHead>
@@ -59,7 +59,7 @@ const PaymentsPage: any = () => {
 				</TableContainer>
 			)}
 
-			{(!data || data.length === 0) && (
+			{isFetched && data.length === 0 && (
 				<Alert severity="info">
 					<AlertTitle>No tienes pagos realizados</AlertTitle>
 					Aca apareceran los pagos que realices
