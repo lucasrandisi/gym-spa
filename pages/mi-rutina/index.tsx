@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 import moment from "moment";
+import Link from "next/link";
 import React, { ReactElement } from "react";
 import { useAuth } from "security/auth.context";
 import RoutineService from "services/routine.service";
@@ -49,6 +50,7 @@ const MiRutinaPage = () => {
 									<TableCell>Inicio</TableCell>
 									<TableCell>Vencimiento</TableCell>
 									<TableCell>Responsable</TableCell>
+									<TableCell />
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -62,6 +64,9 @@ const MiRutinaPage = () => {
 											{routine.to && moment(routine.to).format("DD/MM/YYYY")}
 										</TableCell>
 										<TableCell>{routine.creator}</TableCell>
+										<TableCell>
+											<Link href={`/rutinas/${routine.id}`} passHref>Ver</Link>
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>

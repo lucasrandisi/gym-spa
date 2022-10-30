@@ -80,6 +80,7 @@ const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
 							<TableCell>Nombre</TableCell>
 							<TableCell>Documento</TableCell>
 							<TableCell>Fecha de Pago</TableCell>
+							<TableCell>Tipo</TableCell>
 							<TableCell />
 							<TableCell />
 							<TableCell />
@@ -92,6 +93,7 @@ const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
 								<TableCell>{user.name}</TableCell>
 								<TableCell>{user.nroDoc}</TableCell>
 								<TableCell>{moment(user.payment).format("DD/MM/YYYY")}</TableCell>
+								<TableCell>{user.roles[0].name}</TableCell>
 								<TableCell>
 									<Link href={`/usuarios/${user.id}`}>
 										<IconButton aria-label="edit">
