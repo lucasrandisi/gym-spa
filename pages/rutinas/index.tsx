@@ -18,6 +18,7 @@ import { Box } from "@mui/system";
 import { Button, Snackbar } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Routine } from "models/routine";
+import moment from "moment";
 
 const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) => {
 	const [name, setName] = React.useState("");
@@ -54,7 +55,7 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 					color="secondary"
 				/>
 				<Box sx={{ ml: "auto" }}>
-					<Link href="rutinas/nueva">
+					<Link href="rutinas/nueva" passHref>
 						<Button variant="contained">Agregar</Button>
 					</Link>
 				</Box>
@@ -63,8 +64,10 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 				<Table>
 					<TableHead>
 						<TableRow>
-							<TableCell>Id</TableCell>
 							<TableCell>Nombre</TableCell>
+							<TableCell>Inicio</TableCell>
+							<TableCell>Vencimiento</TableCell>
+							<TableCell>Miembro</TableCell>
 							<TableCell />
 							<TableCell />
 							<TableCell />
@@ -73,8 +76,14 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 					<TableBody>
 						{routines.map(routine => (
 							<TableRow key={routine.id}>
-								<TableCell>{routine.id}</TableCell>
 								<TableCell>{routine.name}</TableCell>
+								<TableCell>
+									{routine.from && moment(routine.from).format("DD/MM/YYYY")}
+								</TableCell>
+								<TableCell>
+									{routine.to && moment(routine.to).format("DD/MM/YYYY")}
+								</TableCell>
+								<TableCell>{routine.user}</TableCell>
 								<TableCell>
 									<Link href={`/rutinas/${routine.id}/edit`} passHref>
 										<IconButton aria-label="edit">
