@@ -8,7 +8,6 @@ import {
 	TableBody,
 	Alert,
 	AlertTitle,
-	Button,
 	Pagination,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -79,7 +78,7 @@ const MiRutinaPage = () => {
 			)}
 
 			{data && data.empty && (
-				<Alert severity="info" icon={false}>
+				<Alert severity="info">
 					<AlertTitle>No tienes rutinas asignadas</AlertTitle>
 					Ponte en contacto con algun miembro de nuestro staff
 				</Alert>

@@ -11,6 +11,8 @@ import {
 	TableRow,
 	TableCell,
 	TableBody,
+	Alert,
+	AlertTitle,
 } from "@mui/material";
 import moment from "moment";
 import Header from "components/header/header";
@@ -33,26 +35,36 @@ const PaymentsPage: any = () => {
 	return (
 		<div>
 			<Header title="Mis pagos" />
-			<TableContainer component={Paper}>
-				<Table>
-					<TableHead>
-						<TableRow>
-							<TableCell>Fecha de Pago</TableCell>
-							<TableCell>Vigencia</TableCell>
-							<TableCell>Monto $</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{data!.map(p => (
-							<TableRow key={p.id}>
-								<TableCell>{moment(p.paymentDate).format("DD/MM/YYYY")}</TableCell>
-								<TableCell>{moment(p.expirationDate).format("DD/MM/YYYY")}</TableCell>
-								<TableCell>${p.amount}</TableCell>
+
+			{data && data.length > 0 && (
+				<TableContainer component={Paper}>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>Fecha de Pago</TableCell>
+								<TableCell>Vigencia</TableCell>
+								<TableCell>Monto $</TableCell>
 							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
+						</TableHead>
+						<TableBody>
+							{data!.map(p => (
+								<TableRow key={p.id}>
+									<TableCell>{moment(p.paymentDate).format("DD/MM/YYYY")}</TableCell>
+									<TableCell>{moment(p.expirationDate).format("DD/MM/YYYY")}</TableCell>
+									<TableCell>${p.amount}</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
+			)}
+
+			{(!data || data.length === 0) && (
+				<Alert severity="info">
+					<AlertTitle>No tienes pagos realizados</AlertTitle>
+					Aca apareceran los pagos que realices
+				</Alert>
+			)}
 		</div>
 	);
 };
