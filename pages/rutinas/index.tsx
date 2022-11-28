@@ -70,7 +70,6 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 							<TableCell>Miembro</TableCell>
 							<TableCell />
 							<TableCell />
-							<TableCell />
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -90,14 +89,13 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 											<EditIcon />
 										</IconButton>
 									</Link>
-								</TableCell>
-								<TableCell>
 									<IconButton
 										onClick={() => deleteRoutine(routine.id)}
 										aria-label="delete">
 										<DeleteIcon />
 									</IconButton>
 								</TableCell>
+
 								<TableCell>
 									<Link href={`/rutinas/${routine.id}`} passHref>
 										Ver
@@ -120,7 +118,7 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 	const response = await api.get("/api/routines", {
 		headers: {
-			Authorization: "Bearer " + req.cookies.access_token,
+			Authorization: `Bearer ${  req.cookies.access_token}`,
 		},
 	});
 

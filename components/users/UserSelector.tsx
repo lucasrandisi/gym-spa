@@ -6,15 +6,19 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import useDebounce from "hooks/useDebounce";
-import { User } from "models/user";
 import React from "react";
 import UserService from "services/user.service";
 
+export type UserSelectorType = {
+	id: number;
+	name: string;
+};
+
 export type UserSelectorProps = {
 	disabled?: boolean;
-	value: User | null;
+	value: UserSelectorType | null;
 	// eslint-disable-next-line no-unused-vars
-	onChange: (user: User | null) => {};
+	onChange: (user: UserSelectorType | null) => {};
 	label: String;
 };
 
@@ -39,7 +43,7 @@ const UserSelector = ({ disabled, value, onChange, label }: UserSelectorProps) =
 		}
 	}
 
-	const getOptionLabel = (option: User): string => option.name;
+	const getOptionLabel = (option: UserSelectorType): string => option.name;
 
 	const renderInput = (params: AutocompleteRenderInputParams): React.ReactNode => (
 		<TextField

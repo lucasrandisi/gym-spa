@@ -35,7 +35,7 @@ const MiRutinaPage = ({ routine }: { routine: Routine }) => (
 					{routine.routineExercises.map(routineExercise => (
 						<TableRow key={routineExercise.id}>
 							<TableCell>{routineExercise.day}</TableCell>
-							<TableCell>{routineExercise.exercise.name}</TableCell>
+							<TableCell>{routineExercise.name}</TableCell>
 							<TableCell>{routineExercise.sets}</TableCell>
 							<TableCell>{routineExercise.reps}</TableCell>
 						</TableRow>
