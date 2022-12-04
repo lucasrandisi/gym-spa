@@ -1,84 +1,131 @@
 import React, { ReactElement, useState } from "react";
-import TextField from '@mui/material/TextField';
-import { api } from "services/api";
-import styles from '../components/home/home.module.scss';
+import TextField from "@mui/material/TextField";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { Box } from "@mui/material";
+import { Box, Button, Chip } from "@mui/material";
 import Header from "components/header/header";
-import moment from 'moment';
-import { User } from "models/user";
+import moment from "moment";
+import UserService from "services/user.service";
+import { MemberStatus } from "models/memberStatus";
+import styles from "../components/home/home.module.scss";
 
-enum UserStatus {
-    AllowAccess,
-    PaymentRequired,
-    UserNotFound,
+const statuses = {
+	AllowAccess: "Acceso Permitido",
+	PaymentRequired: "Pago Requerido",
+	UserNotFound: "Usuario no encontrado",
+	None: "No hay datos",
+} as const;
+
+type UserStatusType = typeof statuses;
+type UserStatus = UserStatusType[keyof UserStatusType];
+
+function colorFromStatus(status: UserStatus): string {
+	switch (status) {
+		case statuses.AllowAccess:
+			return "#A8DCD1";
+		case statuses.PaymentRequired:
+			return "#e9c46a";
+		case statuses.UserNotFound:
+			return "#ff4400b8";
+		case statuses.None:
+		default:
+			return "#b5b3b3";
+	}
+}
+
+function isPaymentRequired(user: MemberStatus) {
+	if (user.expirationDate == null) {
+		return true;
+	}
+	const expirationDate = moment(user.expirationDate);
+	const today = moment();
+	return expirationDate.isBefore(today);
+}
+
+function getChipStatus(user: MemberStatus) {
+	if (user.lastPaymentDate === null) {
+		return "No se ha realizado ningún pago";
+	}
+
+	if (isPaymentRequired(user)) {
+		return "Pago vencido";
+	}
+
+	return "Pago vigente";
 }
 
 const HomePage = () => {
-    const [nroDoc, setNroDoc] = useState("");
-    const [userStatus, setUserStatus] = useState<UserStatus>(UserStatus.UserNotFound);
-    const [user, setUser] = useState<User | null>();
+	const [nroDoc, setNroDoc] = useState("");
+	const [userStatus, setUserStatus] = useState<UserStatus>(statuses.None);
+	const [user, setUser] = useState<MemberStatus | null>();
 
-    async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const searchValue = event.target.value;
-        setNroDoc(searchValue);
+	async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+		event.preventDefault();
+		const searchValue = event.target.value;
+		setNroDoc(searchValue);
 
-        if (searchValue.length === 8) {
-            const response = await api.get(`/api/users/nro-doc/${searchValue}`)
-            const user: User = response.data;
-        
-            setUser(user);
+		if (searchValue.length !== 8) {
+			setUser(null);
+			setUserStatus(statuses.None);
+			return;
+		}
 
-            if (user) {
-                if (moment(user.payment).add(1, "months").isAfter(moment())) {
-                    setUserStatus(UserStatus.AllowAccess);
-                } else {
-                    setUserStatus(UserStatus.PaymentRequired);
-                }
-            } else {
-                setUserStatus(UserStatus.UserNotFound);
-            }
-        } else {
-            setUser(null);
-            setUserStatus(UserStatus.UserNotFound);
-        }
-    }
+		UserService.getByDoc(searchValue)
+			.then(u => {
+				setUser(u);
+				if (!isPaymentRequired(u)) {
+					setUserStatus(statuses.AllowAccess);
+					return;
+				}
+				setUserStatus(statuses.PaymentRequired);
+			})
+			.catch(() => {
+				setUser(null);
+				setUserStatus(statuses.UserNotFound);
+			});
+	}
 
-    return (
-        <>
-            <Header title="Bienvenido" />
-            <Box sx={{display: "flex", justifyContent: "center", mt: 10}}>
-                <TextField
-                id="outlined-name"
-                label="Nro de Documento"
-                value={nroDoc}
-                onChange={handleChange}
-                type="number"
-                className={styles.numberInput}
-                sx={{width: "30%"}}
-                />
-            </Box>
-            <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", mt: 4}}>
-                <Box className={styles.userInfoBox}
-                    sx={{
-                        bgcolor: userStatus === UserStatus.AllowAccess
-                            ? "#ff4400b8"
-                            : userStatus === UserStatus.PaymentRequired
-                                ? "secondary.main"
-                                : "#b5b3b3"
-                    }}
-                >
-                    <Box className={styles.userDataRow}>Nombre: {user?.name}</Box>
-                    <Box className={styles.userDataRow}>Documento: {user?.nroDoc}</Box>
-                    <Box className={styles.userDataRow}>Última Fecha de Pago: {user ? moment(user?.payment).format("DD/MM/YYYY") : null}</Box>
-                </Box>
-                {
-                    userStatus === UserStatus.PaymentRequired
-                        ? <Box className={styles.paymentRequired} sx={{ bgcolor: "secondary.main" }}>Pago Requerido</Box>
-                        : null
-                }
-            </Box>
-        </>
+	return (
+		<>
+			<Header title="Bienvenido" />
+			<Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+				<TextField
+					id="outlined-name"
+					label="Nro de Documento"
+					value={nroDoc}
+					onChange={handleChange}
+					type="number"
+					className={styles.numberInput}
+					sx={{ width: "30%" }}
+					inputProps={{ maxLength: 8 }}
+				/>
+			</Box>
+			<Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 4 }}>
+				<Box
+					className={styles.userInfoBox}
+					sx={{
+						bgcolor: colorFromStatus(userStatus),
+					}}>
+					<Box sx={{ display: "flex", flexDirection: "row" }}>
+						{user ? (
+							<Box>
+								<Chip label={getChipStatus(user)} />
+								<Box>{isPaymentRequired(user) && <Button>Pagar</Button>}</Box>
+							</Box>
+						) : (
+							<Chip label={userStatus} />
+						)}
+					</Box>
+
+					<Box className={styles.userDataRow}>Nombre: {user?.name}</Box>
+					<Box className={styles.userDataRow}>
+						Vencimiento:
+						{user?.expirationDate
+							? moment(user.expirationDate).format("DD/MM/YYYY")
+							: "-"}
+					</Box>
+				</Box>
+			</Box>
+		</>
 	);
 };
 
