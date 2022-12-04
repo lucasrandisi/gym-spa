@@ -1,36 +1,33 @@
 import React, { ReactElement, useState } from "react";
 import TextField from "@mui/material/TextField";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { Box, Button, Chip } from "@mui/material";
+import { Box, Chip, IconButton, Snackbar, Tooltip } from "@mui/material";
 import Header from "components/header/header";
 import moment from "moment";
 import UserService from "services/user.service";
 import { MemberStatus } from "models/memberStatus";
+import { PaidSharp } from "@mui/icons-material";
+import PaymentService from "services/payment.service";
+import { setTimeout } from "timers";
 import styles from "../components/home/home.module.scss";
 
 const statuses = {
-	AllowAccess: "Acceso Permitido",
-	PaymentRequired: "Pago Requerido",
-	UserNotFound: "Usuario no encontrado",
-	None: "No hay datos",
+	AllowAccess: { message: "Acceso Permitido", primary: "#A8DCD1", secondary: "#A8DCD1" },
+	PaymentRequired: {
+		message: "Pago Requerido",
+		primary: "#e9c46a",
+		secondary: "#F9C7C7",
+	},
+	UserNotFound: {
+		message: "Usuario no encontrado",
+		primary: "#ff4400b8",
+		secondary: "#F9C7C7",
+	},
+	None: { message: "No hay datos", primary: "#b5b3b3", secondary: "#F9C7C7" },
 } as const;
 
 type UserStatusType = typeof statuses;
 type UserStatus = UserStatusType[keyof UserStatusType];
-
-function colorFromStatus(status: UserStatus): string {
-	switch (status) {
-		case statuses.AllowAccess:
-			return "#A8DCD1";
-		case statuses.PaymentRequired:
-			return "#e9c46a";
-		case statuses.UserNotFound:
-			return "#ff4400b8";
-		case statuses.None:
-		default:
-			return "#b5b3b3";
-	}
-}
 
 function isPaymentRequired(user: MemberStatus) {
 	if (user.expirationDate == null) {
@@ -57,19 +54,11 @@ const HomePage = () => {
 	const [nroDoc, setNroDoc] = useState("");
 	const [userStatus, setUserStatus] = useState<UserStatus>(statuses.None);
 	const [user, setUser] = useState<MemberStatus | null>();
+	const [openSnackbar, setOpenSnackbar] = React.useState(false);
+	const [snackbarText, setSnackbarText] = React.useState("");
 
-	async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-		event.preventDefault();
-		const searchValue = event.target.value;
-		setNroDoc(searchValue);
-
-		if (searchValue.length !== 8) {
-			setUser(null);
-			setUserStatus(statuses.None);
-			return;
-		}
-
-		UserService.getByDoc(searchValue)
+	async function getMemberStatus(value: string) {
+		UserService.getByDoc(value)
 			.then(u => {
 				setUser(u);
 				if (!isPaymentRequired(u)) {
@@ -82,6 +71,37 @@ const HomePage = () => {
 				setUser(null);
 				setUserStatus(statuses.UserNotFound);
 			});
+	}
+
+	async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+		event.preventDefault();
+		const searchValue = event.target.value;
+		setNroDoc(searchValue);
+
+		if (searchValue.length !== 8) {
+			setUser(null);
+			setUserStatus(statuses.None);
+			return;
+		}
+
+		await getMemberStatus(searchValue);
+	}
+
+	async function updatePayment(id: number) {
+		PaymentService.createPayment({ userId: id, amount: 1000 })
+			.then(() => {
+				getMemberStatus(nroDoc);
+				setSnackbarText("Pago realizado con éxito");
+				setOpenSnackbar(true);
+			})
+			.catch(() => {
+				setSnackbarText("Error al realizar el pago");
+				setOpenSnackbar(true);
+			});
+
+		setTimeout(() => {
+			setOpenSnackbar(false);
+		}, 2000);
 	}
 
 	return (
@@ -100,19 +120,26 @@ const HomePage = () => {
 				/>
 			</Box>
 			<Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 4 }}>
-				<Box
-					className={styles.userInfoBox}
-					sx={{
-						bgcolor: colorFromStatus(userStatus),
-					}}>
-					<Box sx={{ display: "flex", flexDirection: "row" }}>
+				<Box className={styles.userInfoBox} sx={{ bgcolor: userStatus.primary }}>
+					<Box>
 						{user ? (
-							<Box>
+							<Box
+								sx={{
+									display: "flex",
+									flexDirection: "row",
+									alignItems: "center",
+								}}>
 								<Chip label={getChipStatus(user)} />
-								<Box>{isPaymentRequired(user) && <Button>Pagar</Button>}</Box>
+								{isPaymentRequired(user) && (
+									<Tooltip title="Registrar pago">
+										<IconButton onClick={() => updatePayment(user.id)}>
+											<PaidSharp />
+										</IconButton>
+									</Tooltip>
+								)}
 							</Box>
 						) : (
-							<Chip label={userStatus} />
+							<Chip label={userStatus.message} />
 						)}
 					</Box>
 
@@ -125,6 +152,11 @@ const HomePage = () => {
 					</Box>
 				</Box>
 			</Box>
+			<Snackbar
+				open={openSnackbar}
+				message={snackbarText}
+				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+			/>
 		</>
 	);
 };
