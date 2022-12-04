@@ -68,6 +68,7 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 							<TableCell>Inicio</TableCell>
 							<TableCell>Vencimiento</TableCell>
 							<TableCell>Miembro</TableCell>
+							<TableCell>Responsable</TableCell>
 							<TableCell />
 							<TableCell />
 						</TableRow>
@@ -83,6 +84,7 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 									{routine.to && moment(routine.to).format("DD/MM/YYYY")}
 								</TableCell>
 								<TableCell>{routine.user}</TableCell>
+								<TableCell>{routine.creator}</TableCell>
 								<TableCell>
 									<Link href={`/rutinas/${routine.id}/edit`} passHref>
 										<IconButton aria-label="edit">
