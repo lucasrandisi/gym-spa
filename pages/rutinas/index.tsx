@@ -1,34 +1,35 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 import { NextApiRequest } from "next/types";
 import React, { ReactElement } from "react";
 import { api } from "services/api";
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
-import Link from 'next/link';
-import TextField from '@mui/material/TextField';
-import { Box } from '@mui/system';
-import { Button, Snackbar } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { Routine } from 'models/routine';
-
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import Link from "next/link";
+import TextField from "@mui/material/TextField";
+import { Box } from "@mui/system";
+import { Button, Snackbar } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Routine } from "models/routine";
+import moment from "moment";
 
 const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) => {
-	const [name, setName] = React.useState('');
+	const [name, setName] = React.useState("");
 	const [routines, setRoutines] = React.useState(routinesList);
 	const [openDeleteSnackbar, setOpenDeleteSnackbar] = React.useState(false);
 
 	const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = event.target.value;
 		const filteredRoutines = routinesList.filter(routine =>
-			routine.name.toLocaleLowerCase().includes(searchValue));
+			routine.name.toLocaleLowerCase().includes(searchValue)
+		);
 
 		setName(searchValue);
 		setRoutines(filteredRoutines);
@@ -54,7 +55,7 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 					color="secondary"
 				/>
 				<Box sx={{ ml: "auto" }}>
-					<Link href="rutinas/nueva">
+					<Link href="rutinas/nueva" passHref>
 						<Button variant="contained">Agregar</Button>
 					</Link>
 				</Box>
@@ -63,28 +64,44 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 				<Table>
 					<TableHead>
 						<TableRow>
-							<TableCell>Id</TableCell>
 							<TableCell>Nombre</TableCell>
+							<TableCell>Inicio</TableCell>
+							<TableCell>Vencimiento</TableCell>
+							<TableCell>Miembro</TableCell>
+							<TableCell>Responsable</TableCell>
 							<TableCell />
 							<TableCell />
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{routines.map((routine) => (
+						{routines.map(routine => (
 							<TableRow key={routine.id}>
-								<TableCell>{routine.id}</TableCell>
 								<TableCell>{routine.name}</TableCell>
 								<TableCell>
-									<Link href={`/rutinas/${routine.id}`}>
+									{routine.from && moment(routine.from).format("DD/MM/YYYY")}
+								</TableCell>
+								<TableCell>
+									{routine.to && moment(routine.to).format("DD/MM/YYYY")}
+								</TableCell>
+								<TableCell>{routine.user}</TableCell>
+								<TableCell>{routine.creator}</TableCell>
+								<TableCell>
+									<Link href={`/rutinas/${routine.id}/edit`} passHref>
 										<IconButton aria-label="edit">
 											<EditIcon />
 										</IconButton>
 									</Link>
-								</TableCell>
-								<TableCell>
-									<IconButton onClick={() => deleteRoutine(routine.id)} aria-label="delete">
+									<IconButton
+										onClick={() => deleteRoutine(routine.id)}
+										aria-label="delete">
 										<DeleteIcon />
 									</IconButton>
+								</TableCell>
+
+								<TableCell>
+									<Link href={`/rutinas/${routine.id}`} passHref>
+										Ver
+									</Link>
 								</TableCell>
 							</TableRow>
 						))}
@@ -98,15 +115,13 @@ const RoutinesPage: any = ({ routinesList }: { routinesList: Array<Routine> }) =
 			/>
 		</>
 	);
-
-}
-
+};
 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-	const response = await api.get('/api/routines', {
+	const response = await api.get("/api/routines", {
 		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
+			Authorization: `Bearer ${  req.cookies.access_token}`,
+		},
 	});
 
 	return {
@@ -114,7 +129,7 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 			routinesList: response.data,
 			isProtected: true,
 			userTypes: ["Admin"],
-		}
+		},
 	};
 }
 

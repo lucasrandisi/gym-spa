@@ -1,69 +1,108 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Button, Box } from "@mui/material";
+import {
+	TableContainer,
+	Paper,
+	Table,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
+	Alert,
+	AlertTitle,
+	Pagination,
+} from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { User } from "models/user";
-import { NextApiRequest } from "next";
-import React, { ReactElement } from "react"
-import { api } from "services/api";
+import moment from "moment";
+import Link from "next/link";
+import React, { ReactElement } from "react";
+import { useAuth } from "security/auth.context";
+import RoutineService from "services/routine.service";
 
+const MiRutinaPage = () => {
+	const { user } = useAuth();
+	const [page, setPage] = React.useState(0);
 
-const MiRutinaPage = ({ user }: { user: User }) => {
-    return (
-        <>
-            <Header title="Mi Rutina" />
-            <Box sx={{paddingLeft: "1rem"}}>
-                <h2>{ user.routine.name }</h2>
-            </Box>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Día</TableCell>
-                            <TableCell>Nombre</TableCell>
-                            <TableCell>Sets</TableCell>
-                            <TableCell>Reps</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {user.routine.routineExercises.map((routineExercise) => (
-                            <TableRow key={routineExercise.id}>
-                                <TableCell>{routineExercise.day}</TableCell>
-                                <TableCell>{routineExercise.exercise.name}</TableCell>
-                                <TableCell>{routineExercise.sets}</TableCell>
-                                <TableCell>{routineExercise.reps}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </>
-    );
+	const { isLoading, error, data } = useQuery(
+		["my-routines", { page }],
+		() => RoutineService.findAllAssigned(user!.id, page, 4),
+		{
+			keepPreviousData: true,
+			initialData: null,
+		}
+	);
+
+	if (isLoading) return "Loading...";
+
+	if (error) return `An error has occurred: ${(error as Error).message}`;
+
+	return (
+		<>
+			<Header title="Mis Rutinas" />
+
+			{data && !data.empty && (
+				<>
+					<TableContainer component={Paper}>
+						<Table>
+							<TableHead>
+								<TableRow>
+									<TableCell>Nombre</TableCell>
+									<TableCell>Inicio</TableCell>
+									<TableCell>Vencimiento</TableCell>
+									<TableCell>Responsable</TableCell>
+									<TableCell />
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{data.content.map(routine => (
+									<TableRow key={routine.id}>
+										<TableCell>{routine.name}</TableCell>
+										<TableCell>
+											{routine.from && moment(routine.from).format("DD/MM/YYYY")}
+										</TableCell>
+										<TableCell>
+											{routine.to && moment(routine.to).format("DD/MM/YYYY")}
+										</TableCell>
+										<TableCell>{routine.creator}</TableCell>
+										<TableCell>
+											<Link href={`/rutinas/${routine.id}`} passHref>Ver</Link>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TableContainer>
+
+					<Pagination
+						count={data.totalPages}
+						page={page + 1}
+						onChange={(_, value) => setPage(value - 1)}
+						size="large"
+					/>
+				</>
+			)}
+
+			{data && data.empty && (
+				<Alert severity="info">
+					<AlertTitle>No tienes rutinas asignadas</AlertTitle>
+					Ponte en contacto con algun miembro de nuestro staff
+				</Alert>
+			)}
+		</>
+	);
+};
+
+export async function getServerSideProps() {
+	return {
+		props: {
+			isProtected: true,
+			userTypes: ["User"],
+		},
+	};
 }
-
-export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-    const [userResponse] = await Promise.all([
-        api.get('/api/users/me', {
-            headers: {
-                Authorization: "Bearer " + req.cookies.access_token
-            }
-        })
-    ]);
-
-    return {
-        props: {
-            user: userResponse.data,
-
-            isProtected: true,
-            userTypes: ["Admin", "User"],
-        }
-    };
-}
-
 
 MiRutinaPage.getLayout = function getLayout(page: ReactElement) {
-    return <AuthLayout>{page}</AuthLayout>;
+	return <AuthLayout>{page}</AuthLayout>;
 };
 
 export default MiRutinaPage;
-
-

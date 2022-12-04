@@ -6,16 +6,22 @@ import {
 	RoutineFormType,
 } from "components/routines/routine-form/RoutinesForm";
 import { Exercise } from "models/exercise";
+import { Routine } from "models/routine";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
 import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
-const NewRoutine: any = ({ exercises }: { exercises: Array<Exercise> }) => {
+type EditRoutineProps = {
+	routine: Routine;
+	exercises: Exercise[];
+};
+
+const EditRoutine: any = ({ routine, exercises }: EditRoutineProps) => {
 	const router = useRouter();
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
-	const onSubmit = (values: RoutineFormType): void => {
+	function handleSubmit(values: RoutineFormType): void {
 		const body = {
 			userId: values.user.id,
 			name: values.name,
@@ -28,37 +34,54 @@ const NewRoutine: any = ({ exercises }: { exercises: Array<Exercise> }) => {
 				reps: newExerciseRoutine.reps,
 			})),
 		};
-
-		api.post("/api/routines", body).then(() => {
+		api.put(`/api/routines/${routine.id}`, body).then(() => {
 			setOpenSnackbar(true);
-			setTimeout(() => router.push("/rutinas"), 2000);
+			setTimeout(() => router.push("/rutinas"), 1000);
 		});
-	};
+	}
 
 	return (
 		<>
 			<Header title="Rutinas" />
 			<Box sx={{ display: "flex", justifyContent: "center", ml: "1rem" }}>
-				<RoutineForm exercises={exercises} onSubmit={onSubmit} />
+				<RoutineForm
+					routine={routine}
+					exercises={exercises}
+					onSubmit={(values: RoutineFormType) => handleSubmit(values)}
+				/>
 			</Box>
 			<Snackbar
 				open={openSnackbar}
-				message="Rutina registrada"
+				message="Rutina actualizada"
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			/>
 		</>
 	);
 };
 
-export async function getServerSideProps({ req }: { req: NextApiRequest }) {
-	const exercisesResponse = await api.get("/api/exercises", {
-		headers: {
-			Authorization: `Bearer ${req.cookies.access_token}`,
-		},
-	});
+export async function getServerSideProps({
+	req,
+	params,
+}: {
+	req: NextApiRequest;
+	params: { id: string };
+}) {
+	const [routineResponse, exercisesResponse] = await Promise.all([
+		api.get(`/api/routines/${params.id}`, {
+			headers: {
+				Authorization: `Bearer ${req.cookies.access_token}`,
+			},
+		}),
+		api.get("/api/exercises", {
+			headers: {
+				Authorization: `Bearer ${req.cookies.access_token}`,
+			},
+		}),
+	]);
 
 	return {
 		props: {
+			routine: routineResponse.data,
 			exercises: exercisesResponse.data,
 			isProtected: true,
 			userTypes: ["Admin"],
@@ -66,8 +89,8 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 	};
 }
 
-export default NewRoutine;
+export default EditRoutine;
 
-NewRoutine.getLayout = function getLayout(page: ReactElement) {
+EditRoutine.getLayout = function getLayout(page: ReactElement) {
 	return <AuthLayout>{page}</AuthLayout>;
 };
