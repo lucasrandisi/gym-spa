@@ -1,3 +1,4 @@
+import { MemberStatus } from "models/memberStatus";
 import { User } from "models/user";
 import { api } from "./api";
 
@@ -31,5 +32,10 @@ class UserService {
 		const { data: users } = await api.get<Array<User>>(`/api/users/search?name=${name}`);
 		return users;
 	};
+
+	static getByDoc = async (doc: String): Promise<MemberStatus> => {
+		const { data: user } = await api.get<MemberStatus>(`/api/users/nro-doc/${doc}`);
+		return user;
+	}
 }
 export default UserService;

@@ -1,84 +1,163 @@
 import React, { ReactElement, useState } from "react";
-import TextField from '@mui/material/TextField';
-import { api } from "services/api";
-import styles from '../components/home/home.module.scss';
+import TextField from "@mui/material/TextField";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { Box } from "@mui/material";
+import { Box, Chip, IconButton, Snackbar, Tooltip } from "@mui/material";
 import Header from "components/header/header";
-import moment from 'moment';
-import { User } from "models/user";
+import moment from "moment";
+import UserService from "services/user.service";
+import { MemberStatus } from "models/memberStatus";
+import { PaidSharp } from "@mui/icons-material";
+import PaymentService from "services/payment.service";
+import { setTimeout } from "timers";
+import styles from "../components/home/home.module.scss";
 
-enum UserStatus {
-    AllowAccess,
-    PaymentRequired,
-    UserNotFound,
+const statuses = {
+	AllowAccess: { message: "Acceso Permitido", primary: "#A8DCD1", secondary: "#A8DCD1" },
+	PaymentRequired: {
+		message: "Pago Requerido",
+		primary: "#e9c46a",
+		secondary: "#F9C7C7",
+	},
+	UserNotFound: {
+		message: "Usuario no encontrado",
+		primary: "#ff4400b8",
+		secondary: "#F9C7C7",
+	},
+	None: { message: "No hay datos", primary: "#b5b3b3", secondary: "#F9C7C7" },
+} as const;
+
+type UserStatusType = typeof statuses;
+type UserStatus = UserStatusType[keyof UserStatusType];
+
+function isPaymentRequired(user: MemberStatus) {
+	if (user.expirationDate == null) {
+		return true;
+	}
+	const expirationDate = moment(user.expirationDate);
+	const today = moment();
+	return expirationDate.isBefore(today);
+}
+
+function getChipStatus(user: MemberStatus) {
+	if (user.lastPaymentDate === null) {
+		return "No se ha realizado ningún pago";
+	}
+
+	if (isPaymentRequired(user)) {
+		return "Pago vencido";
+	}
+
+	return "Pago vigente";
 }
 
 const HomePage = () => {
-    const [nroDoc, setNroDoc] = useState("");
-    const [userStatus, setUserStatus] = useState<UserStatus>(UserStatus.UserNotFound);
-    const [user, setUser] = useState<User | null>();
+	const [nroDoc, setNroDoc] = useState("");
+	const [userStatus, setUserStatus] = useState<UserStatus>(statuses.None);
+	const [user, setUser] = useState<MemberStatus | null>();
+	const [openSnackbar, setOpenSnackbar] = React.useState(false);
+	const [snackbarText, setSnackbarText] = React.useState("");
 
-    async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const searchValue = event.target.value;
-        setNroDoc(searchValue);
+	async function getMemberStatus(value: string) {
+		UserService.getByDoc(value)
+			.then(u => {
+				setUser(u);
+				if (!isPaymentRequired(u)) {
+					setUserStatus(statuses.AllowAccess);
+					return;
+				}
+				setUserStatus(statuses.PaymentRequired);
+			})
+			.catch(() => {
+				setUser(null);
+				setUserStatus(statuses.UserNotFound);
+			});
+	}
 
-        if (searchValue.length === 8) {
-            const response = await api.get(`/api/users/nro-doc/${searchValue}`)
-            const user: User = response.data;
-        
-            setUser(user);
+	async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+		event.preventDefault();
+		const searchValue = event.target.value;
+		setNroDoc(searchValue);
 
-            if (user) {
-                if (moment(user.payment).add(1, "months").isAfter(moment())) {
-                    setUserStatus(UserStatus.AllowAccess);
-                } else {
-                    setUserStatus(UserStatus.PaymentRequired);
-                }
-            } else {
-                setUserStatus(UserStatus.UserNotFound);
-            }
-        } else {
-            setUser(null);
-            setUserStatus(UserStatus.UserNotFound);
-        }
-    }
+		if (searchValue.length !== 8) {
+			setUser(null);
+			setUserStatus(statuses.None);
+			return;
+		}
 
-    return (
-        <>
-            <Header title="Bienvenido" />
-            <Box sx={{display: "flex", justifyContent: "center", mt: 10}}>
-                <TextField
-                id="outlined-name"
-                label="Nro de Documento"
-                value={nroDoc}
-                onChange={handleChange}
-                type="number"
-                className={styles.numberInput}
-                sx={{width: "30%"}}
-                />
-            </Box>
-            <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", mt: 4}}>
-                <Box className={styles.userInfoBox}
-                    sx={{
-                        bgcolor: userStatus === UserStatus.AllowAccess
-                            ? "#ff4400b8"
-                            : userStatus === UserStatus.PaymentRequired
-                                ? "secondary.main"
-                                : "#b5b3b3"
-                    }}
-                >
-                    <Box className={styles.userDataRow}>Nombre: {user?.name}</Box>
-                    <Box className={styles.userDataRow}>Documento: {user?.nroDoc}</Box>
-                    <Box className={styles.userDataRow}>Última Fecha de Pago: {user ? moment(user?.payment).format("DD/MM/YYYY") : null}</Box>
-                </Box>
-                {
-                    userStatus === UserStatus.PaymentRequired
-                        ? <Box className={styles.paymentRequired} sx={{ bgcolor: "secondary.main" }}>Pago Requerido</Box>
-                        : null
-                }
-            </Box>
-        </>
+		await getMemberStatus(searchValue);
+	}
+
+	async function updatePayment(id: number) {
+		PaymentService.createPayment({ userId: id, amount: 1000 })
+			.then(() => {
+				getMemberStatus(nroDoc);
+				setSnackbarText("Pago realizado con éxito");
+				setOpenSnackbar(true);
+			})
+			.catch(() => {
+				setSnackbarText("Error al realizar el pago");
+				setOpenSnackbar(true);
+			});
+
+		setTimeout(() => {
+			setOpenSnackbar(false);
+		}, 2000);
+	}
+
+	return (
+		<>
+			<Header title="Bienvenido" />
+			<Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+				<TextField
+					id="outlined-name"
+					label="Nro de Documento"
+					value={nroDoc}
+					onChange={handleChange}
+					type="number"
+					className={styles.numberInput}
+					sx={{ width: "30%" }}
+					inputProps={{ maxLength: 8 }}
+				/>
+			</Box>
+			<Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 4 }}>
+				<Box className={styles.userInfoBox} sx={{ bgcolor: userStatus.primary }}>
+					<Box>
+						{user ? (
+							<Box
+								sx={{
+									display: "flex",
+									flexDirection: "row",
+									alignItems: "center",
+								}}>
+								<Chip label={getChipStatus(user)} />
+								{isPaymentRequired(user) && (
+									<Tooltip title="Registrar pago">
+										<IconButton onClick={() => updatePayment(user.id)}>
+											<PaidSharp />
+										</IconButton>
+									</Tooltip>
+								)}
+							</Box>
+						) : (
+							<Chip label={userStatus.message} />
+						)}
+					</Box>
+
+					<Box className={styles.userDataRow}>Nombre: {user?.name}</Box>
+					<Box className={styles.userDataRow}>
+						Vencimiento:
+						{user?.expirationDate
+							? moment(user.expirationDate).format("DD/MM/YYYY")
+							: "-"}
+					</Box>
+				</Box>
+			</Box>
+			<Snackbar
+				open={openSnackbar}
+				message={snackbarText}
+				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+			/>
+		</>
 	);
 };
 

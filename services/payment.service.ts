@@ -20,4 +20,9 @@ export default class PaymentService {
 		);
 		return payments;
 	};
+
+	static createPayment = async (values: any) => {
+		const { data: payment } = await api.post<Payment>("/api/payments/pay", values);
+		return payment;
+	}
 }
