@@ -7,12 +7,13 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { Menu, MenuItem, Tooltip, Avatar } from "@mui/material";
+import { Menu, MenuItem, Tooltip } from "@mui/material";
 import { FitnessCenter, Logout } from "@mui/icons-material";
 import { useAuth } from "security/auth.context";
-import SideNavMenu from "components/nav/SideMenu";
+import SideNavMenu, { RouteGroup } from "components/nav/SideMenu";
+import { settings } from "components/nav/NavRoutes";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
 	const auth = useAuth();
@@ -75,7 +76,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 					<Box sx={{ flexGrow: 0 }}>
 						<Tooltip title="Open settings">
 							<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <AccountCircleIcon sx={{ color: "white", fontSize: 40}}/>
+								<AccountCircleIcon sx={{ color: "white", fontSize: 40 }} />
 							</IconButton>
 						</Tooltip>
 						<Menu
@@ -93,6 +94,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 							}}
 							open={Boolean(anchorElUser)}
 							onClose={handleCloseUserMenu}>
+							<RouteGroup items={settings} open />
 							<MenuItem onClick={auth.logout}>
 								<ListItemIcon sx={{ mr: 0.5 }}>
 									<Logout />

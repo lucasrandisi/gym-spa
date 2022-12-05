@@ -64,7 +64,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== "open" })
 	})
 );
 
-const RouteGroup = ({ items, open }: { items: RouteType[]; open: boolean }) => {
+export const RouteGroup = ({ items, open }: { items: RouteType[]; open: boolean }) => {
 	const router = useRouter();
 	return (
 		<List>
