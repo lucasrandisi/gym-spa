@@ -1,4 +1,4 @@
-import { Box, Snackbar } from "@mui/material";
+import { Box } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 import {
@@ -8,12 +8,13 @@ import {
 import { Exercise } from "models/exercise";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
-import React, { ReactElement, useState } from "react";
+import { useSnackbar } from "notistack";
+import React, { ReactElement } from "react";
 import { api } from "services/api";
 
 const NewRoutine: any = ({ exercises }: { exercises: Array<Exercise> }) => {
 	const router = useRouter();
-	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const { enqueueSnackbar } = useSnackbar();
 
 	const onSubmit = (values: RoutineFormType): void => {
 		const body = {
@@ -30,8 +31,8 @@ const NewRoutine: any = ({ exercises }: { exercises: Array<Exercise> }) => {
 		};
 
 		api.post("/api/routines", body).then(() => {
-			setOpenSnackbar(true);
-			setTimeout(() => router.push("/rutinas"), 2000);
+			enqueueSnackbar("Rutina registrada", { variant: "success" });
+			router.push("/rutinas");
 		});
 	};
 
@@ -41,11 +42,6 @@ const NewRoutine: any = ({ exercises }: { exercises: Array<Exercise> }) => {
 			<Box sx={{ display: "flex", justifyContent: "center", ml: "1rem" }}>
 				<RoutineForm exercises={exercises} onSubmit={onSubmit} />
 			</Box>
-			<Snackbar
-				open={openSnackbar}
-				message="Rutina registrada"
-				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-			/>
 		</>
 	);
 };

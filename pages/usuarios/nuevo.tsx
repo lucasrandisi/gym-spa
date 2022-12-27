@@ -1,33 +1,33 @@
-import { Box, Snackbar } from "@mui/material";
+import { Box } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
 import { UserForm, UserFormType } from "components/users/UserForm";
 import { Rol } from "models/rol";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 import React, { ReactElement, useState } from "react";
 import { api } from "services/api";
 
+const initialValues: UserFormType = {
+	name: "",
+	email: "",
+	password: "",
+	nroDoc: "",
+	rolId: 2,
+};
+
 const NewUser: any = ({ roles }: { roles: Rol[] }) => {
 	const router = useRouter();
-	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const { enqueueSnackbar } = useSnackbar();
 	const [submitError, setSubmitError] = useState(null);
-
-	const initialValues: UserFormType = {
-		name: "",
-		email: "",
-		password: "",
-		nroDoc: "",
-		rolId: 2,
-	};
 
 	function onSubmit(values: UserFormType) {
 		api
 			.post("/api/users", values)
 			.then(() => {
-				setOpenSnackbar(true);
-
-				setTimeout(() => router.push("/usuarios"), 2000);
+				enqueueSnackbar("Usuario Registrado", { variant: "success" });
+				router.push("/usuarios");
 			})
 			.catch(errorResponse => {
 				setSubmitError(errorResponse.message);
@@ -46,11 +46,6 @@ const NewUser: any = ({ roles }: { roles: Rol[] }) => {
 					submitError={submitError}
 				/>
 			</Box>
-			<Snackbar
-				open={openSnackbar}
-				message="Usuario Registrado"
-				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-			/>
 		</>
 	);
 };

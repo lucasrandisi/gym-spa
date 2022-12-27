@@ -1,58 +1,57 @@
-import { Box, Snackbar } from "@mui/material";
+import { Box } from "@mui/material";
 import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import { MuscleGroupForm, MuscleGroupFormType } from "components/muscle-groups/MuscleGroupForm";
+import {
+	MuscleGroupForm,
+	MuscleGroupFormType,
+} from "components/muscle-groups/MuscleGroupForm";
 import { MuscleGroup } from "models/muscle-group";
 import { NextApiRequest } from "next";
 import { useRouter } from "next/router";
-import React, { ReactElement, useState } from "react";
+import { useSnackbar } from "notistack";
+import React, { ReactElement } from "react";
 import { api } from "services/api";
 
 type EditMuscleGroupProps = {
 	muscleGroup: MuscleGroup;
-}
+};
 
 const EditMuscleGroup: any = ({ muscleGroup }: EditMuscleGroupProps) => {
-	const router = useRouter()
-	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const router = useRouter();
+	const { enqueueSnackbar } = useSnackbar();
 
 	const initialValues: MuscleGroupFormType = {
 		name: muscleGroup.name,
 	};
 
 	function onSubmit(values: MuscleGroupFormType) {
-		api.put(`/api/muscle-groups/${muscleGroup.id}`, values)
-			.then(() => {
-				setOpenSnackbar(true);
-
-				setTimeout(() => router.push("/grupos-musculares"), 1000);
-			});
+		api.put(`/api/muscle-groups/${muscleGroup.id}`, values).then(() => {
+			enqueueSnackbar("Grupo Muscular actualizado", { variant: "success" });
+			router.push("/grupos-musculares");
+		});
 	}
 
 	return (
 		<>
 			<Header title="Grupos Musculares" />
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
-				<MuscleGroupForm
-					initialValues={initialValues}
-					onSubmit={onSubmit}
-				/>
+				<MuscleGroupForm initialValues={initialValues} onSubmit={onSubmit} />
 			</Box>
-			<Snackbar
-				open={openSnackbar}
-				message="Grupo Muscular actualizado"
-				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-			/>
 		</>
 	);
-}
+};
 
-export async function getServerSideProps({ req, params }: { req: NextApiRequest, params: { id: string } }) {
-	console.log(params.id);
+export async function getServerSideProps({
+	req,
+	params,
+}: {
+	req: NextApiRequest;
+	params: { id: string };
+}) {
 	const muscleGroupResponse = await api.get(`/api/muscle-groups/${params.id}`, {
 		headers: {
-			Authorization: "Bearer " + req.cookies.access_token
-		}
+			Authorization: `Bearer ${req.cookies.access_token}`,
+		},
 	});
 
 	return {
@@ -60,7 +59,7 @@ export async function getServerSideProps({ req, params }: { req: NextApiRequest,
 			muscleGroup: muscleGroupResponse.data,
 			isProtected: true,
 			userTypes: ["Admin"],
-		}
+		},
 	};
 }
 

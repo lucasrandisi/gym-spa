@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "security/auth.context";
 import Head from "next/head";
 import Auth from "security/auth";
+import { SnackbarProvider } from "notistack";
 
 type NextPageWithLayout = NextPage & {
 	// eslint-disable-next-line no-unused-vars
@@ -31,11 +32,16 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 			<QueryClientProvider client={queryClient}>
 				<AuthProvider>
 					<ThemeProvider theme={theme}>
-						{getLayout(
-							<Auth>
-								<Component {...pageProps} />
-							</Auth>
-						)}
+						<SnackbarProvider
+							maxSnack={3}
+							autoHideDuration={5000}
+							anchorOrigin={{ horizontal: "right", vertical: "bottom" }}>
+							{getLayout(
+								<Auth>
+									<Component {...pageProps} />
+								</Auth>
+							)}
+						</SnackbarProvider>
 					</ThemeProvider>
 				</AuthProvider>
 			</QueryClientProvider>

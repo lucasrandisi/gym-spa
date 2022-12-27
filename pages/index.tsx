@@ -1,14 +1,14 @@
 import React, { ReactElement, useState } from "react";
 import TextField from "@mui/material/TextField";
 import AuthLayout from "components/auth-layout/auth-layout";
-import { Box, Chip, IconButton, Snackbar, Tooltip } from "@mui/material";
+import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import Header from "components/header/header";
 import moment from "moment";
 import UserService from "services/user.service";
 import { MemberStatus } from "models/memberStatus";
 import { PaidSharp } from "@mui/icons-material";
 import PaymentService from "services/payment.service";
-import { setTimeout } from "timers";
+import { useSnackbar } from "notistack";
 import styles from "../components/home/home.module.scss";
 
 const statuses = {
@@ -54,8 +54,7 @@ const HomePage = () => {
 	const [nroDoc, setNroDoc] = useState("");
 	const [userStatus, setUserStatus] = useState<UserStatus>(statuses.None);
 	const [user, setUser] = useState<MemberStatus | null>();
-	const [openSnackbar, setOpenSnackbar] = React.useState(false);
-	const [snackbarText, setSnackbarText] = React.useState("");
+	const { enqueueSnackbar } = useSnackbar();
 
 	async function getMemberStatus(value: string) {
 		UserService.getByDoc(value)
@@ -91,17 +90,11 @@ const HomePage = () => {
 		PaymentService.createPayment({ userId: id, amount: 1000 })
 			.then(() => {
 				getMemberStatus(nroDoc);
-				setSnackbarText("Pago realizado con éxito");
-				setOpenSnackbar(true);
+				enqueueSnackbar("Pago realizado con éxito", { variant: "success" });
 			})
 			.catch(() => {
-				setSnackbarText("Error al realizar el pago");
-				setOpenSnackbar(true);
+				enqueueSnackbar("Error al realizar el pago", { variant: "error" });
 			});
-
-		setTimeout(() => {
-			setOpenSnackbar(false);
-		}, 2000);
 	}
 
 	return (
@@ -152,11 +145,6 @@ const HomePage = () => {
 					</Box>
 				</Box>
 			</Box>
-			<Snackbar
-				open={openSnackbar}
-				message={snackbarText}
-				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-			/>
 		</>
 	);
 };
