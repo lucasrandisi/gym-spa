@@ -92,7 +92,11 @@ const UsersPage: any = ({ usersList }: { usersList: Array<User> }) => {
 								<TableCell>{user.id}</TableCell>
 								<TableCell>{user.name}</TableCell>
 								<TableCell>{user.nroDoc}</TableCell>
-								<TableCell>{moment(user.payment).format("DD/MM/YYYY")}</TableCell>
+								<TableCell>
+									{user.payments[0]?.paymentDate
+										? moment(user.payments[0]?.paymentDate).format("DD/MM/YYYY")
+										: null}
+								</TableCell>
 								<TableCell>{user.roles[0].name}</TableCell>
 								<TableCell>
 									<Link href={`/usuarios/${user.id}`}>
