@@ -1,26 +1,54 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, ThemeOptions } from "@mui/material/styles";
 
-export default createTheme({
-	palette: {
-		mode: "light",
-		primary: {
-			// light: will be calculated from palette.primary.main,
-			main: "#ff4400",
-			// dark: will be calculated from palette.primary.main,
-			// contrastText: will be calculated to contrast with palette.primary.main
+// assets
+import colors from "./_themes-vars.module.scss";
+
+import componentStyleOverrides from "./compStyleOverride";
+import themePalette from "./palette";
+import themeTypography from "./typography";
+
+/**
+ * Represent theme style and structure as per Material-UI
+ * @param {JsonObject} customization customization parameter object
+ */
+
+export const theme = (customization: any) => {
+	const color = colors;
+
+	const themeOption = {
+		colors: color,
+		heading: color.grey900,
+		paper: color.paper,
+		backgroundDefault: color.paper,
+		background: color.primaryLight,
+		darkTextPrimary: color.grey700,
+		darkTextSecondary: color.grey500,
+		textDark: color.grey900,
+		menuSelected: color.secondaryDark,
+		menuSelectedBack: color.secondaryLight,
+		divider: color.grey200,
+		customization,
+	};
+
+	const themeOptions: ThemeOptions = {
+		direction: "ltr",
+		palette: themePalette(themeOption),
+		mixins: {
+			toolbar: {
+				minHeight: "48px",
+				padding: "16px",
+				"@media (min-width: 600px)": {
+					minHeight: "48px",
+				},
+			},
 		},
-		secondary: {
-			// light: will be calculated from palette.secondary.main,
-            main: "#d7d701",
-			// dark: will be calculated from palette.secondary.main,
-			// contrastText: will be calculated to contrast with palette.secondary.main
-        },
-		// Used by `getContrastText()` to maximize the contrast between
-		// the background and the text.
-		contrastThreshold: 3,
-		// Used by the functions below to shift a color's luminance by approximately
-		// two indexes within its tonal palette.
-		// E.g., shift from Red 500 to Red 300 or Red 700.
-		tonalOffset: 0.2,
-	},
-});
+		typography: themeTypography(themeOption),
+	};
+
+	const themes = createTheme(themeOptions);
+	themes.components = componentStyleOverrides(themeOption);
+
+	return themes;
+};
+
+export default theme;

@@ -38,7 +38,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 			<AppBar
 				position="fixed"
 				elevation={0}
-				sx={{ zIndex: theme => theme.zIndex.drawer + 1 }}>
+				sx={{ zIndex: theme => theme.zIndex.drawer + 1, height: "60px"}}>
 				<Toolbar>
 					<Box sx={{ display: "flex", alignItems: "center" }}>
 						<IconButton
