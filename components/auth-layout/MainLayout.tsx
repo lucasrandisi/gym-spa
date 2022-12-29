@@ -4,7 +4,7 @@ import { AppBar, Box, CssBaseline, Toolbar } from "@mui/material";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
-const drawerWidth = 260;
+const drawerWidth = 240;
 
 // styles
 const Main = styled("main", { shouldForwardProp: prop => prop !== "open" })(

@@ -2,7 +2,7 @@ import { ChipTypeMap } from "@mui/material";
 
 export type NavItemType = {
 	id: string;
-	title: string;
+	title?: string;
 	caption?: string;
 	type: "group" | "item" | "collapse" | "extLink";
 	children?: NavItemType[];

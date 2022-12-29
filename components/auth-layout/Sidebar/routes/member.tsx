@@ -11,7 +11,6 @@ const icons = {
 
 const member: NavItemType = {
 	id: "member",
-	title: "Members",
 	type: "group",
 	children: [
 		{
@@ -38,8 +37,8 @@ const member: NavItemType = {
 			url: "/payments",
 			target: true,
 			chip: {
-				label: "2",
-				color: "primary",
+				label: "Nuevo!",
+				color: "warning",
 			},
 		},
 	],

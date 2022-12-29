@@ -9,9 +9,8 @@ import { BrowserView, MobileView } from "react-device-detect";
 
 import MenuList from "./MenuList";
 import LogoSection from "../LogoSection";
-import MenuCard from "../../cards/EarningCard";
 
-const drawerWidth = 260;
+const drawerWidth = 240;
 
 const Sidebar = ({ drawerOpen, drawerToggle, window }: any) => {
 	const theme = useTheme();
@@ -24,6 +23,8 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }: any) => {
 					<LogoSection />
 				</Box>
 			</Box>
+
+			{/* Browser */}
 			<BrowserView>
 				<PerfectScrollbar
 					component="div"
@@ -33,13 +34,13 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }: any) => {
 						paddingRight: "16px",
 					}}>
 					<MenuList />
-					<MenuCard />
 				</PerfectScrollbar>
 			</BrowserView>
+
+			{/* Mobile */}
 			<MobileView>
 				<Box sx={{ px: 2 }}>
 					<MenuList />
-					<MenuCard />
 				</Box>
 			</MobileView>
 		</>
