@@ -1,12 +1,10 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import AuthLayout from "components/auth-layout/auth-layout";
 import Header from "components/header/header";
-import MainCard from "components/cards/MainCard";
-import SubCard from "components/cards/SubCard";
 import EarningCard from "components/cards/EarningCard";
 import TotalIncomeLightCard from "components/cards/TotalIncomeLightCard";
 import TotalIncomeDarkCard from "components/cards/TotalIncomeDarkCard";
 import { Grid } from "@mui/material";
+import MainLayout from "components/auth-layout/MainLayout";
 
 const DashboardPage = () => {
 	const [isLoading, setLoading] = useState(true);
@@ -19,8 +17,6 @@ const DashboardPage = () => {
 	return (
 		<>
 			<Header title="Dashboard" />
-			<MainCard title="Dashboard" />
-			<SubCard title="Dashboard" />
 
 			<Grid container spacing={3}>
 				<Grid item xs={12}>
@@ -56,7 +52,7 @@ export async function getStaticProps() {
 	};
 }
 DashboardPage.getLayout = function getLayout(page: ReactElement) {
-	return <AuthLayout>{page}</AuthLayout>;
+	return <MainLayout>{page}</MainLayout>;
 };
 
 export default DashboardPage;
