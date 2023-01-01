@@ -23,7 +23,7 @@ const MainCard = forwardRef(
 			sx = {},
 			title,
 			...others
-		},
+		}: any,
 		ref
 	) => {
 		const theme = useTheme();
@@ -31,6 +31,7 @@ const MainCard = forwardRef(
 		return (
 			<Card
 				ref={ref}
+				// eslint-disable-next-line react/jsx-props-no-spreading
 				{...others}
 				sx={{
 					border: border ? "1px solid" : "none",
@@ -78,6 +79,20 @@ MainCard.propTypes = {
 	shadow: PropTypes.string,
 	sx: PropTypes.object,
 	title: PropTypes.oneOfType([PropTypes.node, PropTypes.string, PropTypes.object]),
+};
+
+MainCard.defaultProps = {
+	border: true,
+	boxShadow: true,
+	children: null,
+	content: true,
+	contentClass: "",
+	contentSX: {},
+	darkTitle: false,
+	secondary: null,
+	shadow: "",
+	sx: {},
+	title: null,
 };
 
 MainCard.displayName = "MainCard";

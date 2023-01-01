@@ -3,6 +3,8 @@ import { useTheme } from "@mui/material/styles";
 import { Avatar, Box, ButtonBase } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoSection from "../LogoSection";
+import NotificationSection from "./NotificationSection";
+import ProfileSection from "./ProfileSection";
 
 const Header = ({ handleLeftDrawerToggle }: any) => {
 	const theme = useTheme();
@@ -43,6 +45,9 @@ const Header = ({ handleLeftDrawerToggle }: any) => {
 
 			<Box sx={{ flexGrow: 1 }} />
 			<Box sx={{ flexGrow: 1 }} />
+
+			<NotificationSection />
+			<ProfileSection />
 		</>
 	);
 };
