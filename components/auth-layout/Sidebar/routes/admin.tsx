@@ -6,6 +6,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
+import StoreIcon from "@mui/icons-material/Store";
 import { NavItemType } from "./navItemType";
 
 const icons = {
@@ -17,6 +18,7 @@ const icons = {
 	AssignmentIcon,
 	FitnessCenterIcon,
 	AccessibilityIcon,
+	StoreIcon,
 };
 
 const admin: NavItemType = {
@@ -84,6 +86,20 @@ const admin: NavItemType = {
 					url: "/grupos-musculares",
 					target: true,
 				},
+				{
+					id: "locations",
+					title: "Establecimientos",
+					type: "item",
+					icon: icons.StoreIcon,
+					url: "/locations",
+				},
+				{
+					id: "staff",
+					title: "Staff",
+					type: "item",
+					icon: icons.PersonAddIcon,
+					url: "/staff",
+				}
 			],
 		},
 	],
