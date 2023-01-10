@@ -3,7 +3,6 @@ import React, { ReactElement } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { useRouter } from "next/router";
 import { useTheme, styled, alpha } from "@mui/material/styles";
 import { Grid, Typography } from "@mui/material";
 import { LocationOn } from "@mui/icons-material";
@@ -20,8 +19,8 @@ import ArchiveIcon from "@mui/icons-material/Archive";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Header from "components/header/header";
 import LocationBusinessHoursGrid from "components/locations/businessHours/BusinessHoursGrid";
+import MainCard from "components/cards/MainCard";
 
 const StyledMenu = styled((props: MenuProps) => (
 	<Menu
@@ -64,7 +63,7 @@ const StyledMenu = styled((props: MenuProps) => (
 	},
 }));
 
-const LocationPage = () => {
+const LocationPage = ({ id }) => {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 	const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -75,8 +74,6 @@ const LocationPage = () => {
 	};
 	const theme = useTheme();
 	const { enqueueSnackbar } = useSnackbar();
-	const router = useRouter();
-	const { id } = router.query;
 
 	const getLocation = useQuery(["location", id], () => LocationsService.get(id), {
 		onError: () => {
@@ -87,9 +84,7 @@ const LocationPage = () => {
 	const location: any = getLocation.data?.data;
 
 	return (
-		<>
-			<Header title={location?.name} />
-
+		<MainCard title={location?.name}>
 			<Grid container spacing={2}>
 				<Grid item>
 					<Button
@@ -142,12 +137,14 @@ const LocationPage = () => {
 					</Typography>
 				</Grid>
 			</Grid>
-
-			<Grid container spacing={2}>
-				<LocationBusinessHoursGrid />
-			</Grid>
-		</>
+			<LocationBusinessHoursGrid id={id} />
+		</MainCard>
 	);
+};
+
+LocationPage.getInitialProps = async ({ query }) => {
+	const { id } = query;
+	return { id };
 };
 
 LocationPage.getLayout = function getLayout(page: ReactElement) {
