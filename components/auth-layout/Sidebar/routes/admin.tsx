@@ -6,6 +6,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import StoreIcon from "@mui/icons-material/Store";
 import { NavItemType } from "./navItemType";
 
@@ -19,6 +20,7 @@ const icons = {
 	FitnessCenterIcon,
 	AccessibilityIcon,
 	StoreIcon,
+	CalendarMonthIcon
 };
 
 const admin: NavItemType = {
@@ -94,11 +96,11 @@ const admin: NavItemType = {
 					url: "/locations",
 				},
 				{
-					id: "staff",
-					title: "Staff",
+					id: "calendar",
+					title: "Calendario",
 					type: "item",
-					icon: icons.PersonAddIcon,
-					url: "/staff",
+					icon: icons.CalendarMonthIcon,
+					url: "/calendar",
 				}
 			],
 		},

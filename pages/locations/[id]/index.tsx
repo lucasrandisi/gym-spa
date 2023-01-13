@@ -21,6 +21,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import LocationBusinessHoursGrid from "components/locations/businessHours/BusinessHoursGrid";
 import MainCard from "components/cards/MainCard";
+import { NextPageContext } from "next";
 
 const StyledMenu = styled((props: MenuProps) => (
 	<Menu
@@ -73,12 +74,9 @@ const LocationPage = ({ id }) => {
 		setAnchorEl(null);
 	};
 	const theme = useTheme();
-	const { enqueueSnackbar } = useSnackbar();
 
 	const getLocation = useQuery(["location", id], () => LocationsService.get(id), {
-		onError: () => {
-			enqueueSnackbar("Ups! Algo salió mal", { variant: "error" });
-		},
+		enabled: !!id,
 	});
 
 	const location: any = getLocation.data?.data;
@@ -142,9 +140,13 @@ const LocationPage = ({ id }) => {
 	);
 };
 
-LocationPage.getInitialProps = async ({ query }) => {
-	const { id } = query;
-	return { id };
+LocationPage.getInitialProps = async (ctx: NextPageContext) => {
+	const { id } = ctx.query;
+	return {
+		id,
+		isProtected: true,
+		userTypes: ["Admin"],
+	};
 };
 
 LocationPage.getLayout = function getLayout(page: ReactElement) {
