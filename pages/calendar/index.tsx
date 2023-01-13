@@ -1,13 +1,6 @@
 import React, { ReactElement } from "react";
 
-import {
-	Button,
-	Dialog,
-	useMediaQuery,
-	DialogTitle,
-	Paper,
-	Typography,
-} from "@mui/material";
+import { Button, Dialog, useMediaQuery, Paper, Typography, Chip } from "@mui/material";
 import { Box, useTheme } from "@mui/system";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataGrid, GridColDef, esES } from "@mui/x-data-grid";
@@ -21,30 +14,33 @@ import HolidayDataGridActions from "components/holidays/HolidayActions";
 import moment from "moment";
 
 const columns: GridColDef[] = [
-	{ field: "name", headerName: "Nombre", flex: 1 },
-	{ field: "description", headerName: "Descripcion", flex: 2 },
 	{
 		field: "date",
 		headerName: "Fecha",
 		width: 100,
-        disableColumnMenu: true,
+		disableColumnMenu: true,
 		valueFormatter: params => moment(params?.value).format("DD/MM/YYYY"),
 	},
+	{ field: "name", headerName: "Nombre", flex: 1 },
+	{ field: "description", headerName: "Descripcion", flex: 2 },
 	{
-		field: "openTime",
-		headerName: "Apertura",
-		width: 75,
-        disableColumnMenu: true,
-        sortable: false,
+		field: "businessHours",
+		headerName: "Horas de atención",
+		width: 140,
+		disableColumnMenu: true,
+		sortable: false,
 		valueFormatter: params => moment(params?.value, "HH:mm").format("HH:mm"),
-	},
-	{
-		field: "closeTime",
-		headerName: "Cierre",
-		width: 75,
-        disableColumnMenu: true,
-        sortable: false,
-		valueFormatter: params => moment(params?.value, "HH:mm").format("HH:mm"),
+		renderCell: ({ row: { openTime, closeTime } }) => {
+			if (openTime === closeTime) {
+				return <Chip label="Cerrado" color="error" variant="outlined" />;
+			}
+			return (
+				<Typography variant="body2">
+					{moment(openTime, "HH:mm").format("HH:mm")} -{" "}
+					{moment(closeTime, "HH:mm").format("HH:mm")}
+				</Typography>
+			);
+		},
 	},
 	{
 		field: "actions",
@@ -124,7 +120,9 @@ const HolidaysGridToolbar = () => {
 			</Box>
 
 			<Dialog open={open} onClose={handleClose} fullScreen={fullScreen}>
-				<DialogTitle>Nuevo feriado</DialogTitle>
+				<Typography variant="h2" component="h1" sx={{ flexGrow: 1, p: "24px", pb: 0 }}>
+					Nuevo feriado
+				</Typography>
 				<HolidayForm handleAdd={handleAdd} handleClose={handleClose} />
 			</Dialog>
 		</Box>
