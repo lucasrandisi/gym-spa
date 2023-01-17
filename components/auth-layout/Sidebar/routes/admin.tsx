@@ -111,6 +111,13 @@ const admin: NavItemType = {
 					icon: icons.GradeIcon,
 					url: "/services",
 				},
+				{
+					id: "packages",
+					title: "Paquetes",
+					type: "item",
+					// icon: <SvgIcon>{icons.PackageIcon}</SvgIcon>,
+					url: "/packages",
+				},
 			],
 		},
 	],

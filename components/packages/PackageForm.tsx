@@ -20,7 +20,7 @@ const initialValues = {
 	price: 0,
 };
 
-export type ServiceFormValuesType = typeof initialValues;
+export type PackageFormValuesType = typeof initialValues;
 
 const validationSchema = Yup.object({
 	name: Yup.string().required("Requerido"),
@@ -30,13 +30,13 @@ const validationSchema = Yup.object({
 	price: Yup.number().positive().required("Requerido"),
 });
 
-interface ServiceFormProps {
+interface PackageFormProps {
 	// eslint-disable-next-line no-unused-vars
-	handleAdd: (values: ServiceFormValuesType) => void;
+	handleAdd: (values: PackageFormValuesType) => void;
 	handleClose: () => void;
 }
 
-const ServiceForm = ({ handleAdd, handleClose }: ServiceFormProps) => (
+const PackageForm = ({ handleAdd, handleClose }: PackageFormProps) => (
 	<Formik
 		initialValues={initialValues}
 		onSubmit={handleAdd}
@@ -122,4 +122,4 @@ const ServiceForm = ({ handleAdd, handleClose }: ServiceFormProps) => (
 	</Formik>
 );
 
-export default ServiceForm;
+export default PackageForm;
