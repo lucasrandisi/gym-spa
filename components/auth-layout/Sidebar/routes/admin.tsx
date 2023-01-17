@@ -7,6 +7,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import GradeIcon from "@mui/icons-material/Grade";
 import StoreIcon from "@mui/icons-material/Store";
 import { NavItemType } from "./navItemType";
 
@@ -20,7 +21,8 @@ const icons = {
 	FitnessCenterIcon,
 	AccessibilityIcon,
 	StoreIcon,
-	CalendarMonthIcon
+	CalendarMonthIcon,
+	GradeIcon,
 };
 
 const admin: NavItemType = {
@@ -101,7 +103,14 @@ const admin: NavItemType = {
 					type: "item",
 					icon: icons.CalendarMonthIcon,
 					url: "/calendar",
-				}
+				},
+				{
+					id: "services",
+					title: "Servicios",
+					type: "item",
+					icon: icons.GradeIcon,
+					url: "/services",
+				},
 			],
 		},
 	],
