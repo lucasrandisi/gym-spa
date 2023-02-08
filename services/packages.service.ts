@@ -37,4 +37,8 @@ export default class PackagesService {
 		const { data: p } = await api.delete<Package>(`/api/packages/${id}`);
 		return p;
 	};
+
+	static async updatePackageServices(packageId: number, servicesId: number[]) {
+		return api.put(`/api/packages/${packageId}/services`, servicesId);
+	}
 }

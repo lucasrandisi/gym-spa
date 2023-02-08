@@ -1,17 +1,28 @@
 import React, { ReactElement } from "react";
 import { GetServerSideProps } from "next";
-import { Grid, Paper, Typography } from "@mui/material";
+import { Grid, IconButton, Paper, Tooltip } from "@mui/material";
 
 import MainLayout from "components/auth-layout/MainLayout";
 import { useQuery } from "@tanstack/react-query";
 import PackagesService from "services/packages.service";
 import PackageServicesTable from "components/packages/PackageServicesTable";
 import MainCard from "components/cards/MainCard";
+import PackageForm from "components/packages/PackageForm";
+import PackageForm2 from "components/packages/PackageForm2";
+import EditIcon from "@mui/icons-material/Edit";
 
-const PackagePage = ({ id }) => {
-	const { data } = useQuery(["package", id], () => PackagesService.get(id), {
-		enabled: !!id,
-	});
+type PackagePageProps = {
+	id: number;
+};
+
+const PackagePage = ({ id }: PackagePageProps) => {
+	const { data } = useQuery(["package-services", id], () => PackagesService.get(id));
+
+	const [edit, setEdit] = React.useState(false);
+
+	const handleCancel = () => {
+		setEdit(prev => !prev);
+	};
 
 	if (!data) return null;
 
@@ -19,21 +30,26 @@ const PackagePage = ({ id }) => {
 		<Grid container columnSpacing={2} rowGap={3}>
 			<Grid item xs={6}>
 				<Paper>
+					{!edit && (
+						<IconButton
+							sx={{ ml: "auto" }}
+							size="small"
+							onClick={() => setEdit(prev => !prev)}>
+							<Tooltip title="Editar">
+								<EditIcon />
+							</Tooltip>
+						</IconButton>
+					)}
+
 					<MainCard title="Paquete">
-						<Typography variant="h4">{data.name}</Typography>
-						<Typography variant="h6">{data.description}</Typography>
-						<Typography variant="h6">{data.price}</Typography>
-						<Typography variant="h6">{data.duration}</Typography>
-						<Typography variant="h6">{data.active}</Typography>
-						<Typography variant="h6">{data.createdAt}</Typography>
-						<Typography variant="h6">{data.updatedAt}</Typography>
+						<PackageForm2 object={data} edit={edit} onCancel={handleCancel} />
 					</MainCard>
 				</Paper>
 			</Grid>
 
 			<Grid item xs={6}>
 				<Paper>
-					<PackageServicesTable services={data.services} />
+					<PackageServicesTable id={id} services={data.services} />
 				</Paper>
 			</Grid>
 		</Grid>

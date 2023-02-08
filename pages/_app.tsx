@@ -5,6 +5,7 @@ import { theme } from "styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { NextPage } from "next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AuthProvider } from "security/auth.context";
 import Head from "next/head";
 import Auth from "security/auth";
@@ -33,6 +34,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 				<meta name="viewport" content="initial-scale=1, width=device-width" />
 			</Head>
 			<QueryClientProvider client={queryClient}>
+				<ReactQueryDevtools initialIsOpen={false} />
 				<AuthProvider>
 					<ThemeProvider theme={theme(customization)}>
 						<NavigationScroll>
