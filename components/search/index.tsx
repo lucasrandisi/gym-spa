@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import PropTypes from "prop-types";
-import { useState } from "react";
+import React from "react";
 
 // material-ui
 import { useTheme, styled } from "@mui/material/styles";
@@ -61,25 +61,25 @@ const HeaderAvatarStyle = styled(Avatar, { shouldForwardProp })(({ theme }) => (
 	},
 }));
 
-const MobileSearch = ({ value, setValue }) => {
-	const theme = useTheme();
-
-	return (
-		<OutlineInputStyle
-			id="input-search-header"
-			value={value}
-			onChange={e => setValue(e.target.value)}
-			placeholder="Buscar"
-			startAdornment={
-				<InputAdornment position="start">
-					<SearchIcon color={theme.palette.grey[500]} />
-				</InputAdornment>
-			}
-			aria-describedby="search-helper-text"
-			inputProps={{ "aria-label": "weight" }}
-		/>
-	);
+type SearchSectionProps = {
+	onChange: React.ChangeEventHandler;
 };
+
+const MobileSearch = ({ onChange }: SearchSectionProps) => (
+	<OutlineInputStyle
+		id="input-search-header"
+		// value={value}
+		onChange={onChange}
+		placeholder="Buscar"
+		startAdornment={
+			<InputAdornment position="start">
+				<SearchIcon />
+			</InputAdornment>
+		}
+		aria-describedby="search-helper-text"
+		inputProps={{ "aria-label": "weight" }}
+	/>
+);
 
 MobileSearch.propTypes = {
 	value: PropTypes.string,
@@ -87,9 +87,8 @@ MobileSearch.propTypes = {
 	popupState: PopupState,
 };
 
-const SearchSection = () => {
+const SearchSection = ({ onChange }: SearchSectionProps) => {
 	const theme = useTheme();
-	const [value, setValue] = useState("");
 
 	return (
 		<>
@@ -124,11 +123,7 @@ const SearchSection = () => {
 													alignItems="center"
 													justifyContent="space-between">
 													<Grid item xs>
-														<MobileSearch
-															value={value}
-															setValue={setValue}
-															popupState={popupState}
-														/>
+														<MobileSearch onChange={onChange} popupState={popupState} />
 													</Grid>
 												</Grid>
 											</Box>
@@ -143,12 +138,11 @@ const SearchSection = () => {
 			<Box sx={{ display: { xs: "none", md: "block" } }}>
 				<OutlineInputStyle
 					id="input-search-header"
-					value={value}
-					onChange={e => setValue(e.target.value)}
+					onChange={onChange}
 					placeholder="Buscar"
 					startAdornment={
 						<InputAdornment position="start">
-							<SearchIcon color={theme.palette.grey[500]} />
+							<SearchIcon />
 						</InputAdornment>
 					}
 					aria-describedby="search-helper-text"

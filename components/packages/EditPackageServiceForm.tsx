@@ -9,7 +9,7 @@ import PackagesService from "services/packages.service";
 import { useSnackbar } from "notistack";
 import SearchSection from "components/search";
 
-const columns: GridColDef[] = [{ field: "name", headerName: "Nombre" }];
+const columns: GridColDef[] = [{ field: "name", headerName: "Nombre", flex: 1 }];
 
 const initialValues = {
 	services: [],
@@ -27,6 +27,7 @@ interface EditPackageServicesProps {
 
 const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesProps) => {
 	const [selection, setSelection] = React.useState<GridRowId[]>(services);
+	const [search, setSearch] = React.useState<string>("");
 	const { enqueueSnackbar } = useSnackbar();
 	const queryCache = useQueryClient();
 
@@ -57,6 +58,20 @@ const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesP
 		save.mutate();
 	};
 
+	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearch(e.target.value);
+	};
+
+	const filterModel = {
+		items: [
+			{
+				columnField: "name",
+				operatorValue: "contains",
+				value: search,
+			},
+		],
+	};
+
 	return (
 		<Formik
 			initialValues={initialValues}
@@ -67,14 +82,13 @@ const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesP
 					<DialogContent sx={{ p: 2 }}>
 						<Grid container rowGap={2} columnSpacing={2}>
 							<Grid item xs={6}>
-								<SearchSection />
+								<SearchSection onChange={handleSearch} />
 							</Grid>
 
 							<Grid item xs={12}>
 								<DataGrid
 									rows={data}
 									columns={columns}
-									autoHeight
 									localeText={esES.components.MuiDataGrid.defaultProps.localeText}
 									loading={isLoading}
 									error={error}
@@ -84,8 +98,13 @@ const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesP
 										setSelection(newSelection);
 										setFieldValue("services", selection);
 									}}
+									filterModel={filterModel}
 									rowsPerPageOptions={[]}
-									sx={{ "& .MuiDataGrid-row": { cursor: "pointer" }, width: 570 }}
+									sx={{
+										"& .MuiDataGrid-row": { cursor: "pointer" },
+										width: 570,
+										height: 400,
+									}}
 								/>
 							</Grid>
 						</Grid>

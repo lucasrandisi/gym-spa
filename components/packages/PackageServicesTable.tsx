@@ -17,7 +17,17 @@ import EditPackageServices from "./EditPackageServiceForm";
 
 const columns: GridColDef[] = [{ field: "name", headerName: "Servicio", flex: 1 }];
 
-const PackageServicesGridToolbar = ({ id , services }: any) => {
+type PackageServicesGridToolbarProps = {
+	id: number;
+	services: any[];
+	handleSearch: React.ChangeEventHandler;
+};
+
+const PackageServicesGridToolbar = ({
+	id,
+	services,
+	handleSearch,
+}: PackageServicesGridToolbarProps) => {
 	const [open, setOpen] = React.useState(false);
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -51,7 +61,7 @@ const PackageServicesGridToolbar = ({ id , services }: any) => {
 					justifyContent: "space-between",
 					gap: "16px",
 				}}>
-				<SearchSection />
+				<SearchSection onChange={handleSearch} />
 
 				<Tooltip title="Editar">
 					<IconButton color="secondary" onClick={handleOpen}>
@@ -75,17 +85,37 @@ const PackageServicesGridToolbar = ({ id , services }: any) => {
 };
 
 const PackageServicesTable = ({ id = 1, services = [] }) => {
-	const toolbar = () => <PackageServicesGridToolbar id={id} services={services} />;
+	const [search, setSearch] = React.useState("");
+
+	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+		e.preventDefault();
+		setSearch(e.target.value);
+	};
+
+	const filterModel = {
+		items: [
+			{
+				columnField: "name",
+				operatorValue: "contains",
+				value: search,
+			},
+		],
+	};
+
 	return (
 		<Paper>
 			<DataGrid
 				rows={services}
-				columns={columns}	
+				columns={columns}
 				pageSize={5}
 				autoHeight
 				localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+				filterModel={filterModel}
 				components={{
-					Toolbar: toolbar,
+					Toolbar: PackageServicesGridToolbar,
+				}}
+				componentsProps={{
+					toolbar: { id, services, handleSearch },
 				}}
 			/>
 		</Paper>
