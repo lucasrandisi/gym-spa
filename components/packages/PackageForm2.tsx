@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import PropTypes from "prop-types";
 import * as Yup from "yup";
 import {
 	Grid,
@@ -10,6 +11,7 @@ import {
 	MenuItem,
 	ButtonBase,
 	Popover,
+	Select,
 } from "@mui/material";
 import { Field, Form, Formik } from "formik";
 import { Box } from "@mui/system";
@@ -20,6 +22,7 @@ const initialValues = {
 	description: "",
 	active: false,
 	duration: 30,
+	durationType: "days",
 	price: 0,
 	color: "#000000",
 };
@@ -31,7 +34,8 @@ const validationSchema = Yup.object({
 	description: Yup.string().optional(),
 	active: Yup.boolean().required("Requerido"),
 	duration: Yup.number().positive().required("Requerido"),
-	price: Yup.number().positive().required("Requerido"),
+	durationType: Yup.string().required("Requerido"),
+	price: Yup.number().required("Requerido"),
 	color: Yup.string().optional(),
 });
 
@@ -45,10 +49,10 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 	const readOnly = !edit;
 
 	const [open, setOpen] = useState(false);
-	const anchorRef = useRef(null);
+	const anchorRef = useRef<any>(null);
 
-	const handleClose = event => {
-		if (anchorRef.current && anchorRef.current.contains(event.target)) {
+	const handleClose = (e: React.MouseEvent<Document, MouseEvent>) => {
+		if (anchorRef.current && anchorRef.current.contains(e.target)) {
 			return;
 		}
 		setOpen(false);
@@ -60,7 +64,7 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 
 	const prevOpen = useRef(open);
 	useEffect(() => {
-		if (prevOpen.current === true && open === false) {
+		if (prevOpen.current === true && open === false && anchorRef.current) {
 			anchorRef.current.focus();
 		}
 		prevOpen.current = open;
@@ -71,11 +75,7 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 	};
 
 	const handleCancel = () => {
-		onCancel && onCancel();
-	};
-
-	const createPackage = () => {
-		console.log("Create");
+		if (onCancel) onCancel();
 	};
 
 	const updatePackage = () => {
@@ -90,7 +90,7 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 			{({ errors, touched, handleChange, values, resetForm, setFieldValue }) => (
 				<Form>
 					<Grid container rowGap={2} columnSpacing={2}>
-						<Grid item xs={12}>
+						<Grid item xs={10}>
 							<TextField
 								name="name"
 								type="text"
@@ -103,85 +103,11 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 								InputProps={{ readOnly }}
 							/>
 						</Grid>
-						<Grid item xs={12}>
-							<TextField
-								name="description"
-								type="text"
-								label="Descripción"
-								placeholder="Esta descrpción será visible para los clientes."
-								multiline
-								rows={2}
-								maxRows={4}
-								value={values.description}
-								error={Boolean(touched.description && errors.description)}
-								helperText={touched.description && errors.description}
-								onChange={handleChange}
-								fullWidth
-								InputProps={{ readOnly }}
-							/>
-						</Grid>
-						<Grid item xs={6}>
-							<TextField
-								name="duration"
-								type="number"
-								label="Duración"
-								value={values.duration}
-								error={Boolean(touched.duration && errors.duration)}
-								helperText={touched.duration && errors.duration}
-								onChange={handleChange}
-								fullWidth
-								InputProps={{ readOnly }}
-							/>
-						</Grid>
-						<Grid item xs={6}>
-							<TextField
-								name="duration-type"
-								select
-								// label="Tipo de duración"
-								// size="small"
-								// value={}
-								onChange={handleChange}
-								InputProps={{ readOnly }}>
-								<MenuItem value="days">Días</MenuItem>
-								<MenuItem value="weeks">Semanas</MenuItem>
-								<MenuItem value="months">Meses</MenuItem>
-								<MenuItem value="years">Años</MenuItem>
-							</TextField>
-						</Grid>
-						<Grid item xs={6}>
-							<TextField
-								name="price"
-								type="number"
-								label="Precio"
-								value={values.price}
-								error={Boolean(touched.price && errors.price)}
-								helperText={touched.price && errors.price}
-								onChange={handleChange}
-								fullWidth
-								InputProps={{
-									readOnly,
-									startAdornment: <InputAdornment position="start">$</InputAdornment>,
-								}}
-							/>
-						</Grid>
-						<Grid item xs={6}>
-							<Field
-								type="checkbox"
-								name="active"
-								as={FormControlLabel}
-								control={<Checkbox />}
-								label="Activo"
-								value={values.active}
-								error={Boolean(touched.active && errors.active)}
-								helperText={touched.active && errors.active}
-								onChange={handleChange}
-								InputProps={{ readOnly }}
-							/>
-						</Grid>
 
 						<Grid item xs={2}>
 							<ButtonBase
 								onClick={handleToggle}
+								disabled={readOnly}
 								sx={{
 									width: "36px",
 									height: "36px",
@@ -231,6 +157,80 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 								/>
 							</Popover>
 						</Grid>
+						
+						<Grid item xs={12}>
+							<TextField
+								name="description"
+								type="text"
+								label="Descripción"
+								placeholder="Esta descrpción será visible para los clientes."
+								multiline
+								rows={2}
+								maxRows={4}
+								value={values.description}
+								error={Boolean(touched.description && errors.description)}
+								helperText={touched.description && errors.description}
+								onChange={handleChange}
+								fullWidth
+								InputProps={{ readOnly }}
+							/>
+						</Grid>
+						<Grid item xs={6}>
+							<TextField
+								name="duration"
+								type="number"
+								label="Duración"
+								value={values.duration}
+								error={Boolean(touched.duration && errors.duration)}
+								helperText={touched.duration && errors.duration}
+								onChange={handleChange}
+								fullWidth
+								InputProps={{ readOnly }}
+							/>
+						</Grid>
+						<Grid item xs={6}>
+							<Select
+								name="durationType"
+								value={values.durationType}
+								onChange={handleChange}
+								readOnly={readOnly}>
+								<MenuItem value="days">Días</MenuItem>
+								<MenuItem value="weeks">Semanas</MenuItem>
+								<MenuItem value="months">Meses</MenuItem>
+								<MenuItem value="years">Años</MenuItem>
+							</Select>
+						</Grid>
+						<Grid item xs={12}>
+							<TextField
+								name="price"
+								type="number"
+								label="Precio"
+								value={values.price}
+								error={Boolean(touched.price && errors.price)}
+								helperText={touched.price && errors.price}
+								onChange={handleChange}
+							
+								InputProps={{
+									readOnly,
+									startAdornment: <InputAdornment position="start">$</InputAdornment>,
+								}}
+							/>
+						</Grid>
+						<Grid item xs={6}>
+							<Field
+								type="checkbox"
+								name="active"
+								as={FormControlLabel}
+								control={<Checkbox />}
+								label="Activo"
+								value={values.active}
+								error={Boolean(touched.active && errors.active)}
+								helperText={touched.active && errors.active}
+								onChange={handleChange}
+								InputProps={{ readOnly }}
+							/>
+						</Grid>
+
 
 						<Grid item xs={12}>
 							{edit && (
@@ -258,12 +258,24 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 									</Button>
 								</Box>
 							)}
+							
 						</Grid>
 					</Grid>
 				</Form>
 			)}
 		</Formik>
 	);
+};
+
+PackageForm2.propTypes = {
+	edit: PropTypes.bool,
+	onCancel: PropTypes.func,
+};
+
+PackageForm2.defaultProps = {
+	object: {},
+	edit: false,
+	onCancel: () => {},
 };
 
 export default PackageForm2;

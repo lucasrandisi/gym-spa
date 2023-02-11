@@ -1,15 +1,13 @@
 import React, { ReactElement } from "react";
 import { GetServerSideProps } from "next";
-import { Grid, IconButton, Paper, Tooltip } from "@mui/material";
+import { Button, Grid, Paper } from "@mui/material";
 
 import MainLayout from "components/auth-layout/MainLayout";
 import { useQuery } from "@tanstack/react-query";
 import PackagesService from "services/packages.service";
 import PackageServicesTable from "components/packages/PackageServicesTable";
 import MainCard from "components/cards/MainCard";
-import PackageForm from "components/packages/PackageForm";
 import PackageForm2 from "components/packages/PackageForm2";
-import EditIcon from "@mui/icons-material/Edit";
 
 type PackagePageProps = {
 	id: number;
@@ -30,19 +28,19 @@ const PackagePage = ({ id }: PackagePageProps) => {
 		<Grid container columnSpacing={2} rowGap={3}>
 			<Grid item xs={6}>
 				<Paper>
-					{!edit && (
-						<IconButton
-							sx={{ ml: "auto" }}
-							size="small"
-							onClick={() => setEdit(prev => !prev)}>
-							<Tooltip title="Editar">
-								<EditIcon />
-							</Tooltip>
-						</IconButton>
-					)}
-
 					<MainCard title="Paquete">
 						<PackageForm2 object={data} edit={edit} onCancel={handleCancel} />
+
+						{!edit && (
+							<Button
+								type="button"
+								sx={{ ml: "auto" }}
+								onClick={() => setEdit(prev => !prev)}
+								variant="contained"
+								color="primary">
+								Editar
+							</Button>
+						)}
 					</MainCard>
 				</Paper>
 			</Grid>
