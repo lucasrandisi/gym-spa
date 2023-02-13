@@ -41,4 +41,16 @@ export default class PackagesService {
 	static async updatePackageServices(packageId: number, servicesId: number[]) {
 		return api.put(`/api/packages/${packageId}/services`, servicesId);
 	}
+
+	static async findAllByUser(userId: number) {
+		const { data: packages } = await api.get<Array<Package>>(
+			`/api/users/${userId}/packages`
+		);
+		return packages;
+	}
+
+	static async findMyPackages() {
+		const { data: packages } = await api.get<Array<Package>>(`/api/packages/my-packages`);
+		return packages;
+	}
 }

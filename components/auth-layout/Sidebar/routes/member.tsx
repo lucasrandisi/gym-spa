@@ -41,6 +41,14 @@ const member: NavItemType = {
 				color: "warning",
 			},
 		},
+		{
+			id: "packages",
+			title: "Paquetes",
+			type: "item",
+			icon: icons.PaymentIcon,
+			url: "/mis-paquetes",
+			target: true,
+		},
 	],
 };
 
