@@ -36,6 +36,7 @@
 		"react-device-detect": "^2.2.2",
 		"react-dnd": "^16.0.1",
 		"react-dom": "18",
+		"react-icons": "^4.7.1",
 		"react-perfect-scrollbar": "^1.5.8",
 		"sass": "^1.45.1",
 		"styled-components": "^5.3.6",

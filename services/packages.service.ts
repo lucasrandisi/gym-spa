@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-type Package = {
+export type Package = {
 	id: number;
 	name: string;
 	description: string;
@@ -51,6 +51,11 @@ export default class PackagesService {
 
 	static async findMyPackages() {
 		const { data: packages } = await api.get<Array<Package>>(`/api/packages/my-packages`);
+		return packages;
+	}
+
+	static async findAllActive() {
+		const { data: packages } = await api.get<Array<Package>>(`/api/packages/active`);
 		return packages;
 	}
 }
