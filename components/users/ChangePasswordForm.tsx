@@ -1,10 +1,11 @@
 import { Formik, Form } from "formik";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, FormControl, Grid, TextField, Typography } from "@mui/material";
 import * as Yup from "yup";
-import React from "react";
+import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "services/api";
 import { useSnackbar } from "notistack";
+import { calculatePasswordStrength, strengths } from "security/password-strength";
 
 const initialValues = {
 	oldPassword: "",
@@ -27,6 +28,7 @@ const validationSchema = Yup.object()
 
 function ChangePasswordForm() {
 	const { enqueueSnackbar } = useSnackbar();
+	const [passwordStrength, setPasswordStrength] = useState(strengths[0]);
 
 	const mutation = useMutation(
 		["change-password"],
@@ -40,6 +42,14 @@ function ChangePasswordForm() {
 			},
 		}
 	);
+
+	const handleNewPasswordChange = (
+		event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => {
+		const password = event.target.value;
+		const { level, label, color } = calculatePasswordStrength(password);
+		setPasswordStrength({ level, color, label });
+	};
 
 	return (
 		<Formik
@@ -70,8 +80,32 @@ function ChangePasswordForm() {
 							label="Nueva contraseña"
 							error={Boolean(touched.newPassword && errors.newPassword)}
 							helperText={touched.newPassword && errors.newPassword}
-							onChange={handleChange}
+							onChange={event => {
+								handleChange(event);
+								handleNewPasswordChange(event);
+							}}
 						/>
+
+						{passwordStrength && (
+							<FormControl fullWidth>
+								<Box>
+									<Grid container spacing={2} alignItems="center">
+										<Grid item>
+											<Box
+												style={{ backgroundColor: passwordStrength.color }}
+												sx={{ width: 85, height: 8, borderRadius: "7px" }}
+											/>
+										</Grid>
+										<Grid item>
+											<Typography variant="subtitle1" fontSize="0.75rem">
+												{passwordStrength.label}
+											</Typography>
+										</Grid>
+									</Grid>
+								</Box>
+							</FormControl>
+						)}
+
 						<TextField
 							name="confirmPassword"
 							type="password"
