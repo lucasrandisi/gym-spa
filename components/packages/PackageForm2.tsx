@@ -16,6 +16,9 @@ import {
 import { Field, Form, Formik } from "formik";
 import { Box } from "@mui/system";
 import { TwitterPicker } from "react-color";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
+import PackagesService from "services/packages.service";
 
 const initialValues = {
 	name: "",
@@ -43,13 +46,30 @@ interface PackageFormProps {
 	object?: PackageFormValuesType;
 	edit?: boolean;
 	onCancel?: () => void;
+	id?: number;
 }
 
-const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
+const PackageForm2 = ({ object, edit, onCancel, id }: PackageFormProps) => {
 	const readOnly = !edit;
 
+	const { enqueueSnackbar } = useSnackbar();
+	const queryClient = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const anchorRef = useRef<any>(null);
+
+	const save = useMutation(
+		({ id, values }: { id: number; values: PackageFormValuesType }) =>
+			PackagesService.update(id, values),
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries(["package-services", id]);
+				enqueueSnackbar("Guardado con éxito", { variant: "success" });
+			},
+			onError: (error: any) => {
+				enqueueSnackbar(error.message, { variant: "error" });
+			},
+		}
+	);
 
 	const handleClose = (e: React.MouseEvent<Document, MouseEvent>) => {
 		if (anchorRef.current && anchorRef.current.contains(e.target)) {
@@ -71,15 +91,12 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 	}, [open]);
 
 	const handleSave = (values: PackageFormValuesType) => {
-		console.log(values);
+		if (id) save.mutate({ id, values });
+		handleCancel();
 	};
 
 	const handleCancel = () => {
 		if (onCancel) onCancel();
-	};
-
-	const updatePackage = () => {
-		console.log("Update");
 	};
 
 	return (
@@ -157,7 +174,7 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 								/>
 							</Popover>
 						</Grid>
-						
+
 						<Grid item xs={12}>
 							<TextField
 								name="description"
@@ -209,7 +226,6 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 								error={Boolean(touched.price && errors.price)}
 								helperText={touched.price && errors.price}
 								onChange={handleChange}
-							
 								InputProps={{
 									readOnly,
 									startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -223,14 +239,13 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 								as={FormControlLabel}
 								control={<Checkbox />}
 								label="Activo"
-								value={values.active}
+								checked={values.active}
 								error={Boolean(touched.active && errors.active)}
 								helperText={touched.active && errors.active}
 								onChange={handleChange}
 								InputProps={{ readOnly }}
 							/>
 						</Grid>
-
 
 						<Grid item xs={12}>
 							{edit && (
@@ -249,16 +264,11 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 										variant="outlined">
 										Cancelar
 									</Button>
-									<Button
-										type="submit"
-										onClick={updatePackage}
-										variant="contained"
-										color="primary">
+									<Button type="submit" variant="contained" color="primary">
 										Guardar
 									</Button>
 								</Box>
 							)}
-							
 						</Grid>
 					</Grid>
 				</Form>
@@ -270,12 +280,14 @@ const PackageForm2 = ({ object, edit, onCancel }: PackageFormProps) => {
 PackageForm2.propTypes = {
 	edit: PropTypes.bool,
 	onCancel: PropTypes.func,
+	id: PropTypes.number,
 };
 
 PackageForm2.defaultProps = {
 	object: {},
 	edit: false,
 	onCancel: () => {},
+	id: 0,
 };
 
 export default PackageForm2;

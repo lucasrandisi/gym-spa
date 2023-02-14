@@ -29,7 +29,7 @@ const PackagePage = ({ id }: PackagePageProps) => {
 			<Grid item xs={6}>
 				<Paper>
 					<MainCard title="Paquete">
-						<PackageForm2 object={data} edit={edit} onCancel={handleCancel} />
+						<PackageForm2 object={data} edit={edit} onCancel={handleCancel} id={data.id} />
 
 						{!edit && (
 							<Button

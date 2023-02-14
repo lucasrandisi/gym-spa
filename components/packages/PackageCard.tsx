@@ -22,7 +22,7 @@ const PackageCard = ({ item, loading }: PackageCardProps) => {
 	}
 
 	return (
-		<MainCard border={false} content={false}>
+		<MainCard border={false} content={false} boxShadow={theme.shadows[1]}>
 			<Box sx={{ p: 2.25 }}>
 				<Grid container direction="column">
 					<Grid item>
