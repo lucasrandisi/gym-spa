@@ -2,7 +2,7 @@
 import React, { ReactElement } from "react";
 
 import { useQuery } from "@tanstack/react-query";
-import { useSnackbar } from "notistack";
+
 import { useTheme, styled, alpha } from "@mui/material/styles";
 import { Grid, Typography } from "@mui/material";
 import { LocationOn } from "@mui/icons-material";
@@ -22,6 +22,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import LocationBusinessHoursGrid from "components/locations/businessHours/BusinessHoursGrid";
 import MainCard from "components/cards/MainCard";
 import { NextPageContext } from "next";
+import LocationServicesTable from "components/locations/services/LocationServicesTable";
 
 const StyledMenu = styled((props: MenuProps) => (
 	<Menu
@@ -70,6 +71,7 @@ const LocationPage = ({ id }) => {
 	const handleClick = (event: React.MouseEvent<HTMLElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
+
 	const handleClose = () => {
 		setAnchorEl(null);
 	};
@@ -79,64 +81,79 @@ const LocationPage = ({ id }) => {
 		enabled: !!id,
 	});
 
+	const services = useQuery(
+		["location-services", id],
+		() => LocationsService.getAllServices(id),
+		{
+			initialData: [],
+		}
+	);
+
 	const location: any = getLocation.data?.data;
 
 	return (
-		<MainCard title={location?.name}>
-			<Grid container spacing={2}>
-				<Grid item>
-					<Button
-						id="demo-customized-button"
-						aria-controls={open ? "demo-customized-menu" : undefined}
-						aria-haspopup="true"
-						aria-expanded={open ? "true" : undefined}
-						variant="contained"
-						disableElevation
-						onClick={handleClick}
-						endIcon={<KeyboardArrowDownIcon />}>
-						Options
-					</Button>
-					<StyledMenu
-						id="demo-customized-menu"
-						MenuListProps={{
-							"aria-labelledby": "demo-customized-button",
-						}}
-						anchorEl={anchorEl}
-						open={open}
-						onClose={handleClose}>
-						<MenuItem onClick={handleClose} disableRipple>
-							<EditIcon />
-							Edit
-						</MenuItem>
-						<MenuItem onClick={handleClose} disableRipple>
-							<FileCopyIcon />
-							Duplicate
-						</MenuItem>
-						<Divider sx={{ my: 0.5 }} />
-						<MenuItem onClick={handleClose} disableRipple>
-							<ArchiveIcon />
-							Archive
-						</MenuItem>
-						<MenuItem onClick={handleClose} disableRipple>
-							<MoreHorizIcon />
-							More
-						</MenuItem>
-					</StyledMenu>
-				</Grid>
-				<Grid container xs={12} alignItems="center">
-					<LocationOn sx={{ color: theme.palette.primary.main }} />{" "}
-					<Typography variant="body1" component="p">
-						{location?.address}
-					</Typography>
-				</Grid>
-				<Grid item xs={12}>
-					<Typography variant="body1" component="p">
-						{location?.phone}
-					</Typography>
-				</Grid>
+		<Grid container spacing={2}>
+			<Grid item xs={12}>
+				<MainCard title={location?.name}>
+					<Grid container spacing={2}>
+						<Grid item>
+							<Button
+								id="demo-customized-button"
+								aria-controls={open ? "demo-customized-menu" : undefined}
+								aria-haspopup="true"
+								aria-expanded={open ? "true" : undefined}
+								variant="contained"
+								disableElevation
+								onClick={handleClick}
+								endIcon={<KeyboardArrowDownIcon />}>
+								Options
+							</Button>
+							<StyledMenu
+								id="demo-customized-menu"
+								MenuListProps={{
+									"aria-labelledby": "demo-customized-button",
+								}}
+								anchorEl={anchorEl}
+								open={open}
+								onClose={handleClose}>
+								<MenuItem onClick={handleClose} disableRipple>
+									<EditIcon />
+									Edit
+								</MenuItem>
+								<MenuItem onClick={handleClose} disableRipple>
+									<FileCopyIcon />
+									Duplicate
+								</MenuItem>
+								<Divider sx={{ my: 0.5 }} />
+								<MenuItem onClick={handleClose} disableRipple>
+									<ArchiveIcon />
+									Archive
+								</MenuItem>
+								<MenuItem onClick={handleClose} disableRipple>
+									<MoreHorizIcon />
+									More
+								</MenuItem>
+							</StyledMenu>
+						</Grid>
+						<Grid container xs={12} alignItems="center">
+							<LocationOn sx={{ color: theme.palette.primary.main }} />{" "}
+							<Typography variant="body1" component="p">
+								{location?.address}
+							</Typography>
+						</Grid>
+						<Grid item xs={12}>
+							<Typography variant="body1" component="p">
+								{location?.phone}
+							</Typography>
+						</Grid>
+					</Grid>
+					<LocationBusinessHoursGrid id={id} />
+				</MainCard>
 			</Grid>
-			<LocationBusinessHoursGrid id={id} />
-		</MainCard>
+			<Grid item xs={4}>
+				<LocationServicesTable id={id} services={services.data?.data} />
+			</Grid>
+		</Grid>
 	);
 };
 

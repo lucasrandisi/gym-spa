@@ -35,4 +35,12 @@ export default class LocationsService {
 		);
 		return hours;
 	};
+
+	static getAllServices(id: number): any {
+		return api.get(`/api/locations/${id}/services`);
+	}
+
+	static updateLocationServices(id: number, servicesId: number[]): Promise<unknown> {
+		return api.put(`/api/locations/${id}/services`, servicesId);
+	}
 }
