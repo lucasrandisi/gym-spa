@@ -93,7 +93,7 @@ const LocationPage = ({ id }) => {
 
 	return (
 		<Grid container spacing={2}>
-			<Grid item xs={12}>
+			<Grid item xs={12} md={4} sm={6}>
 				<MainCard title={location?.name}>
 					<Grid container spacing={2}>
 						<Grid item>
@@ -147,11 +147,14 @@ const LocationPage = ({ id }) => {
 							</Typography>
 						</Grid>
 					</Grid>
-					<LocationBusinessHoursGrid id={id} />
 				</MainCard>
 			</Grid>
-			<Grid item xs={4}>
+
+			<Grid item xs={12} md={4} sm={6}>
 				<LocationServicesTable id={id} services={services.data?.data} />
+			</Grid>
+			<Grid item xs={12} md={4} sm={6}>
+				<LocationBusinessHoursGrid id={id} />
 			</Grid>
 		</Grid>
 	);

@@ -1,15 +1,12 @@
 import React from "react";
 import * as Yup from "yup";
-import { Grid, Button, DialogContent, DialogActions } from "@mui/material";
+import { Button, DialogContent, DialogActions } from "@mui/material";
 import { Form, Formik } from "formik";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import ServicesService from "services/services.service";
-import { DataGrid, GridColDef, esES, GridRowId } from "@mui/x-data-grid";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GridRowId } from "@mui/x-data-grid";
 import PackagesService from "services/packages.service";
 import { useSnackbar } from "notistack";
-import SearchSection from "components/search";
-
-const columns: GridColDef[] = [{ field: "name", headerName: "Nombre", flex: 1 }];
+import ServicesGrid from "components/locations/services/ServicesGrid";
 
 const initialValues = {
 	services: [],
@@ -26,22 +23,13 @@ interface EditPackageServicesProps {
 }
 
 const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesProps) => {
-	const [selection, setSelection] = React.useState<GridRowId[]>(services);
-	const [search, setSearch] = React.useState<string>("");
 	const { enqueueSnackbar } = useSnackbar();
 	const queryCache = useQueryClient();
 
-	const { data, isLoading, error } = useQuery(["all-services"], ServicesService.getAll, {
-		initialData: [],
-	});
-
-	React.useEffect(() => {
-		setSelection(services);
-	}, [services]);
-
 	const save = useMutation(
 		["save-package-services"],
-		() => PackagesService.updatePackageServices(id, selection.map(Number)),
+		(values: EditPackageServicesValuesType) =>
+			PackagesService.updatePackageServices(id, values.services),
 		{
 			onSuccess: () => {
 				queryCache.invalidateQueries(["package-services", id]);
@@ -54,22 +42,8 @@ const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesP
 		}
 	);
 
-	const handleSave = () => {
-		save.mutate();
-	};
-
-	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearch(e.target.value);
-	};
-
-	const filterModel = {
-		items: [
-			{
-				columnField: "name",
-				operatorValue: "contains",
-				value: search,
-			},
-		],
+	const handleSave = (values: EditPackageServicesValuesType) => {
+		save.mutate(values);
 	};
 
 	return (
@@ -80,34 +54,12 @@ const EditPackageServices = ({ id, services, handleClose }: EditPackageServicesP
 			{({ setFieldValue }) => (
 				<Form>
 					<DialogContent sx={{ p: 2 }}>
-						<Grid container rowGap={2} columnSpacing={2}>
-							<Grid item xs={6}>
-								<SearchSection onChange={handleSearch} />
-							</Grid>
-
-							<Grid item xs={12}>
-								<DataGrid
-									rows={data}
-									columns={columns}
-									localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-									loading={isLoading}
-									error={error}
-									checkboxSelection
-									selectionModel={selection}
-									onSelectionModelChange={newSelection => {
-										setSelection(newSelection);
-										setFieldValue("services", selection);
-									}}
-									filterModel={filterModel}
-									rowsPerPageOptions={[]}
-									sx={{
-										"& .MuiDataGrid-row": { cursor: "pointer" },
-										width: 570,
-										height: 400,
-									}}
-								/>
-							</Grid>
-						</Grid>
+						<ServicesGrid
+							services={services}
+							onSelectionChange={(newSelection: GridRowId[]) => {
+								setFieldValue("services", newSelection);
+							}}
+						/>
 					</DialogContent>
 
 					<DialogActions sx={{ p: 2 }}>
