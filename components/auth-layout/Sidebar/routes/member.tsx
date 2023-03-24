@@ -1,12 +1,14 @@
 import HomeIcon from "@mui/icons-material/Home";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PaymentIcon from "@mui/icons-material/Payment";
+import StarIcon from "@mui/icons-material/Star";
 import { NavItemType } from "./navItemType";
 
 const icons = {
 	HomeIcon,
 	AssignmentIcon,
 	PaymentIcon,
+	StarIcon,
 };
 
 const member: NavItemType = {
@@ -47,6 +49,14 @@ const member: NavItemType = {
 			type: "item",
 			icon: icons.PaymentIcon,
 			url: "/mis-paquetes",
+			target: true,
+		},
+		{
+			id: "packages",
+			title: "Servicios",
+			type: "item",
+			icon: icons.StarIcon,
+			url: "/packages/showcase",
 			target: true,
 		},
 	],
