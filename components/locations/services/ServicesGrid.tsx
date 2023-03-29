@@ -11,11 +11,12 @@ const columns: GridColDef[] = [{ field: "name", headerName: "Nombre", flex: 1 }]
 
 interface EditLocationServicesProps {
 	services: number[]; // Default selected services
+	multiple?: boolean; // Allow multiple selection
 	// eslint-disable-next-line no-unused-vars
 	onSelectionChange: (selection: GridRowId[]) => void; // Callback to update parent state
 }
 
-const ServicesGrid = ({ services, onSelectionChange }: EditLocationServicesProps) => {
+const ServicesGrid = ({ services, onSelectionChange , multiple}: EditLocationServicesProps) => {
 	const [selection, setSelection] = React.useState<GridRowId[]>(services);
 	const [search, setSearch] = React.useState<string>("");
 
@@ -59,7 +60,7 @@ const ServicesGrid = ({ services, onSelectionChange }: EditLocationServicesProps
 					columns={columns}
 					loading={isLoading}
 					error={error}
-					checkboxSelection
+					checkboxSelection={multiple}
 					selectionModel={selection}
 					onSelectionModelChange={handleSelectionChange}
 					filterModel={filterModel}
@@ -77,7 +78,12 @@ const ServicesGrid = ({ services, onSelectionChange }: EditLocationServicesProps
 
 ServicesGrid.propsTypes = {
 	services: PropTypes.arrayOf(PropTypes.number),
+	multiple: PropTypes.bool,
 	onSelectionChange: PropTypes.func,
+};
+
+ServicesGrid.defaultProps = {
+	multiple: true,
 };
 
 export default ServicesGrid;
